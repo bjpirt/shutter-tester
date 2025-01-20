@@ -1,0 +1,8 @@
+debug*
+*.svd
+hardware/fp-info-cache
+hardware/output*
+hardware/*-backups
+hardware/*.lck
+hardware/_autosave*
+hardware/#auto_saved_files#
