@@ -49,7 +49,7 @@
 			(usegerberextensions yes)
 			(usegerberattributes yes)
 			(usegerberadvancedattributes yes)
-			(creategerberjobfile yes)
+			(creategerberjobfile no)
 			(dashed_line_dash_ratio 12.000000)
 			(dashed_line_gap_ratio 3.000000)
 			(svgprecision 4)
@@ -72,12 +72,12 @@
 			(plotfptext yes)
 			(plotinvisibletext no)
 			(sketchpadsonfab no)
-			(subtractmaskfromsilk no)
+			(subtractmaskfromsilk yes)
 			(outputformat 1)
 			(mirror no)
 			(drillshape 0)
 			(scaleselection 1)
-			(outputdirectory "output/v1.0/")
+			(outputdirectory "output/v1.1/")
 		)
 	)
 	(net 0 "")
@@ -825,7 +825,7 @@
 		(descr "Capacitor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "capacitor handsolder")
 		(property "Reference" "C3"
-			(at -3.556 0 360)
+			(at -3.556 0 0)
 			(layer "F.SilkS")
 			(uuid "8e5aa7de-88fe-45ad-ae4f-05d0ed50a4f7")
 			(effects
@@ -836,7 +836,7 @@
 			)
 		)
 		(property "Value" "C"
-			(at 1.524 -1.778 360)
+			(at 1.524 -1.778 0)
 			(layer "F.Fab")
 			(uuid "f8d1064a-6c01-4493-a073-2bb579b260b4")
 			(effects
@@ -991,7 +991,7 @@
 			(uuid "3920b550-dcb8-4585-aa47-a89023681558")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "51cc2e5c-1c36-47eb-b665-64c9bb2cc8a1")
 			(effects
@@ -1049,7 +1049,7 @@
 			)
 		)
 		(property "Value" "C"
-			(at -3.048 0 360)
+			(at -3.048 0 0)
 			(layer "F.Fab")
 			(uuid "070bf192-501f-47c3-a017-4914612386d6")
 			(effects
@@ -1204,7 +1204,7 @@
 			(uuid "73c07858-e935-4dbc-9039-5a05dbd56e65")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 3.302 0 360)
+			(at 3.302 0 0)
 			(layer "F.Fab")
 			(uuid "976dee6f-072e-4012-a50a-c859f58fc417")
 			(effects
@@ -4268,7 +4268,7 @@
 		(descr "Capacitor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator")
 		(tags "capacitor handsolder")
 		(property "Reference" "C1"
-			(at 3.302 0 360)
+			(at 3.302 0 0)
 			(layer "F.SilkS")
 			(uuid "b8cb4ba4-04a9-44a7-8354-5f4667679fc3")
 			(effects
@@ -4279,7 +4279,7 @@
 			)
 		)
 		(property "Value" "C"
-			(at -3.302 0 360)
+			(at -3.302 0 0)
 			(layer "F.Fab")
 			(uuid "fe7c4912-30af-4a98-8aa1-dd6ebdc6b27e")
 			(effects
@@ -4434,7 +4434,7 @@
 			(uuid "e1f0e619-fe4b-48af-bb89-f436c9efb01e")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 0 360)
+			(at 0 0 0)
 			(layer "F.Fab")
 			(uuid "ae8b97f5-5378-440b-9a36-ee8d80ff33d3")
 			(effects
@@ -4767,7 +4767,7 @@
 			(justify right bottom)
 		)
 	)
-	(gr_text "v1.0 2024-12-31"
+	(gr_text "v1.1 2025-01-27"
 		(at 79.502 115.824 0)
 		(layer "F.SilkS")
 		(uuid "1c680a87-a2b6-426c-8600-eeea483a6053")
@@ -4966,6 +4966,24 @@
 		(layers "F.Cu" "B.Cu")
 		(net 2)
 		(uuid "40bd3824-656d-40e5-b38c-2fe75fd84e83")
+	)
+	(via
+		(at 112.63 105.092)
+		(size 0.6)
+		(drill 0.3)
+		(layers "F.Cu" "B.Cu")
+		(free yes)
+		(net 2)
+		(uuid "9d302ce8-fa1c-485b-a026-5bcd487daffa")
+	)
+	(via
+		(at 90.13 104.592)
+		(size 0.6)
+		(drill 0.3)
+		(layers "F.Cu" "B.Cu")
+		(free yes)
+		(net 2)
+		(uuid "acd7b121-bdbd-4745-837e-5ff440162070")
 	)
 	(segment
 		(start 126.238 104.394)
