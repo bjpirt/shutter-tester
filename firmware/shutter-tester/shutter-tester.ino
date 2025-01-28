@@ -1,7 +1,7 @@
 #define LED 8
-#define SENSOR_1 2
-#define SENSOR_2 3
-#define SENSOR_3 4
+#define SENSOR_1 0
+#define SENSOR_2 21
+#define SENSOR_3 20
 
 typedef enum
 {
