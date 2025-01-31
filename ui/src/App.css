@@ -1,0 +1,14 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+
+.summary tr.selected {
+  background-color: #4c4c4c;
+}
+
+.summary .remove {
+  cursor: pointer;
+}

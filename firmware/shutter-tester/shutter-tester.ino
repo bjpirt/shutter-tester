@@ -3,6 +3,13 @@
 #define SENSOR_2 21
 #define SENSOR_3 20
 
+#define TEST_BLUETOOTH
+
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
+
 typedef enum
 {
   WAIT_FOR_OPEN,
@@ -20,17 +27,54 @@ long sensor2_close_time;
 long sensor3_open_time;
 long sensor3_close_time;
 
+BLEServer *pServer = NULL;
+BLECharacteristic *pSensorCharacteristic = NULL;
+BLECharacteristic *pModeCharacteristic = NULL;
+bool deviceConnected = false;
+bool oldDeviceConnected = false;
+char message[128];
+long i = 0;
+
+#define SERVICE_UUID "42de79f1-7248-4c9b-9279-96509b8a9f5c"
+#define SENSOR_CHARACTERISTIC_UUID "42de79f1-7248-4c9b-9279-96509b8a9f5d"
+#define MODE_CHARACTERISTIC_UUID "42de79f1-7248-4c9b-9279-96509b8a9f5e"
+#define DEVICE_NAME "ShutterTester"
+
+class MyServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+    deviceConnected = true;
+  };
+
+  void onDisconnect(BLEServer *pServer)
+  {
+    deviceConnected = false;
+  }
+};
+
+class MyCharacteristicCallbacks : public BLECharacteristicCallbacks
+{
+  void onWrite(BLECharacteristic *pModeCharacteristic)
+  {
+    String value = pModeCharacteristic->getValue();
+    if (value.length() > 0)
+    {
+      Serial.print("Characteristic event, written: ");
+      Serial.println(static_cast<int>(value[0])); // Print the integer value
+    }
+  }
+};
+
 void IRAM_ATTR sensor1_isr()
 {
   if (!digitalRead(SENSOR_1))
   {
-    // Serial.print("A");
     sensor1_open_time = micros();
     sensor1_state = WAIT_FOR_CLOSE;
   }
   else
   {
-    // Serial.print("a");
     sensor1_close_time = micros();
     sensor1_state = DONE;
   }
@@ -40,13 +84,11 @@ void IRAM_ATTR sensor2_isr()
 {
   if (!digitalRead(SENSOR_2))
   {
-    // Serial.print("B");
     sensor2_open_time = micros();
     sensor2_state = WAIT_FOR_CLOSE;
   }
   else
   {
-    // Serial.print("b");
     sensor2_close_time = micros();
     sensor2_state = DONE;
   }
@@ -56,13 +98,11 @@ void IRAM_ATTR sensor3_isr()
 {
   if (!digitalRead(SENSOR_3))
   {
-    // Serial.print("C");
     sensor3_open_time = micros();
     sensor3_state = WAIT_FOR_CLOSE;
   }
   else
   {
-    // Serial.print("c");
     sensor3_close_time = micros();
     sensor3_state = DONE;
   }
@@ -123,6 +163,46 @@ void print_summary(long s1_open_time,
   print_exposure_timing(s3_open_time, s3_close_time);
 }
 
+void setupBluetooth()
+{
+  BLEDevice::init(DEVICE_NAME);
+
+  pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
+
+  // Create the BLE Service
+  BLEService *pService = pServer->createService(SERVICE_UUID);
+
+  // Create a BLE Characteristic
+  pSensorCharacteristic = pService->createCharacteristic(
+      SENSOR_CHARACTERISTIC_UUID,
+      BLECharacteristic::PROPERTY_READ |
+          BLECharacteristic::PROPERTY_WRITE |
+          BLECharacteristic::PROPERTY_NOTIFY |
+          BLECharacteristic::PROPERTY_INDICATE);
+
+  // Create the mode Characteristic
+  pModeCharacteristic = pService->createCharacteristic(
+      MODE_CHARACTERISTIC_UUID,
+      BLECharacteristic::PROPERTY_WRITE);
+
+  pModeCharacteristic->setCallbacks(new MyCharacteristicCallbacks());
+
+  // Create a BLE Descriptor
+  pSensorCharacteristic->addDescriptor(new BLE2902());
+  pModeCharacteristic->addDescriptor(new BLE2902());
+
+  // Start the service
+  pService->start();
+
+  // Start advertising
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(false);
+  pAdvertising->setMinPreferred(0x0);
+  BLEDevice::startAdvertising();
+}
+
 void setup()
 {
   Serial.begin(115200);
@@ -135,6 +215,8 @@ void setup()
   attachInterrupt(SENSOR_1, sensor1_isr, CHANGE);
   attachInterrupt(SENSOR_2, sensor2_isr, CHANGE);
   attachInterrupt(SENSOR_3, sensor3_isr, CHANGE);
+
+  setupBluetooth();
 }
 
 void loop()
@@ -169,5 +251,59 @@ void loop()
     sensor1_state = WAIT_FOR_OPEN;
     sensor2_state = WAIT_FOR_OPEN;
     sensor3_state = WAIT_FOR_OPEN;
+
+    if (deviceConnected)
+    {
+      long minTime = min(sensor1_open_time, sensor3_open_time);
+      sprintf(message, "{\"sensor1\":{\"open\":%ld,\"close\":%ld},\"sensor2\":{\"open\":%ld,\"close\":%ld},\"sensor3\":{\"open\":%ld,\"close\":%ld}}",
+              sensor1_open_time - minTime,
+              sensor1_close_time - minTime,
+              sensor2_open_time - minTime,
+              sensor2_close_time - minTime,
+              sensor3_open_time - minTime,
+              sensor3_close_time - minTime);
+
+      pSensorCharacteristic->setValue(message);
+      pSensorCharacteristic->notify();
+    }
   }
+
+  // disconnecting
+  if (!deviceConnected && oldDeviceConnected)
+  {
+    Serial.println("Device disconnected.");
+    delay(1000);                 // give the bluetooth stack the chance to get things ready
+    pServer->startAdvertising(); // restart advertising
+    Serial.println("Start advertising");
+    oldDeviceConnected = deviceConnected;
+  }
+  // connecting
+  if (deviceConnected && !oldDeviceConnected)
+  {
+    // do stuff here on connecting
+    oldDeviceConnected = deviceConnected;
+    Serial.println("Device Connected");
+  }
+
+#ifdef TEST_BLUETOOTH
+  if (millis() % 5000 == 0)
+  {
+    i++;
+    if (deviceConnected)
+    {
+      Serial.println("Sending measurements");
+      sprintf(message, "{\"sensor1\":{\"open\":%ld,\"close\":%ld},\"sensor2\":{\"open\":%ld,\"close\":%ld},\"sensor3\":{\"open\":%ld,\"close\":%ld}}",
+              0 + i,
+              11111 + i,
+              33333 + i,
+              44444 + i,
+              77777 + i,
+              88888 + i);
+
+      pSensorCharacteristic->setValue(message);
+      pSensorCharacteristic->notify();
+      delay(2);
+    }
+  }
+#endif
 }
