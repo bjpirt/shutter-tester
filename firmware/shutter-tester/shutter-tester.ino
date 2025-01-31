@@ -1,5 +1,5 @@
 #define LED 8
-#define SENSOR_1 0
+#define SENSOR_1 1
 #define SENSOR_2 21
 #define SENSOR_3 20
 

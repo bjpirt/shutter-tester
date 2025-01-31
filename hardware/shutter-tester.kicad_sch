@@ -1506,6 +1506,16 @@
 	)
 	(wire
 		(pts
+			(xy 100.33 95.25) (xy 106.68 95.25)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "3cadf2d4-53c6-47b5-a545-a5505f667090")
+	)
+	(wire
+		(pts
 			(xy 54.61 38.1) (xy 59.69 38.1)
 		)
 		(stroke
@@ -1876,16 +1886,6 @@
 	)
 	(wire
 		(pts
-			(xy 100.33 92.71) (xy 106.68 92.71)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "f347d432-a40d-4707-abcd-11bc6c6d0fa3")
-	)
-	(wire
-		(pts
 			(xy 140.97 38.1) (xy 146.05 38.1)
 		)
 		(stroke
@@ -1946,7 +1946,7 @@
 	)
 	(global_label "SENSOR_1"
 		(shape input)
-		(at 100.33 92.71 180)
+		(at 100.33 95.25 180)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -1956,7 +1956,7 @@
 		)
 		(uuid "6d8076da-c933-4031-927f-849705a1fd64")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 87.6687 92.71 0)
+			(at 87.6687 95.25 0)
 			(effects
 				(font
 					(size 1.27 1.27)
