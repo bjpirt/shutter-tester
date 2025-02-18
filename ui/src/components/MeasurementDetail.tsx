@@ -1,19 +1,21 @@
 import { useContext } from "react";
 import Measurement from "../types/Measurement";
-import MeasurementDetailRow from "./MeasurementDetailRow";
-import { SettingsContext } from "./Settings";
 import Conditional from "./Conditional";
+import MeasurementDetailRow from "./MeasurementDetailRow";
+import { Context } from "./SettingsContext";
 
 type Props = {
   measurements?: Measurement[];
   selectedSpeed: string;
+  removeMeasurement: (speed: string, measurement: Measurement) => void
 };
 
 export default function MeasurementDetail({
   measurements,
   selectedSpeed,
+  removeMeasurement
 }: Props) {
-  const { settings } = useContext(SettingsContext);
+  const { settings } = useContext(Context);
 
   return (
     <table className="measurements">
@@ -30,6 +32,7 @@ export default function MeasurementDetail({
             <th>Shutter 2 (1 - 2)</th>
             <th>Shutter 2 (2 - 3)</th>
           </Conditional>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -39,6 +42,7 @@ export default function MeasurementDetail({
                 measurement={measurement}
                 selectedSpeed={selectedSpeed}
                 key={`meas-${i}`}
+                onRemove={removeMeasurement}
               />
             ))
           : undefined}

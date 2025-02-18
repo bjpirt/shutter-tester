@@ -5,8 +5,8 @@ import {
   microsToMillis,
 } from "../lib/utils";
 import Measurement, { SensorMeasurement } from "../types/Measurement";
-import { SettingsContext } from "./Settings";
 import Conditional from "./Conditional";
+import { Context } from "./SettingsContext";
 
 type Props = {
   speed: string;
@@ -78,7 +78,7 @@ export default function SummaryRow({
 }: Props) {
   const summary = summariseMeasurements(measurements);
   const speedUs = convertSpeedToFloat(speed) * 1000000;
-  const { settings } = useContext(SettingsContext);
+  const { settings } = useContext(Context);
 
   return (
     <tr
