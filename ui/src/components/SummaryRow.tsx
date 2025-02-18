@@ -1,5 +1,12 @@
-import { displaySpeed } from "../lib/utils";
-import Measurement from "../types/Measurement";
+import { useContext } from "react";
+import {
+  convertSpeedToFloat,
+  displaySpeed,
+  microsToMillis,
+} from "../lib/utils";
+import Measurement, { SensorMeasurement } from "../types/Measurement";
+import { SettingsContext } from "./Settings";
+import Conditional from "./Conditional";
 
 type Props = {
   speed: string;
@@ -9,11 +16,18 @@ type Props = {
   measurements?: Measurement[];
 };
 
+type ShutterTiming = { "1-2": number; "2-3": number };
+
 type MeasurementSummary = {
   sensor1?: number;
   sensor2?: number;
   sensor3?: number;
+  shutter1Timing?: ShutterTiming;
+  shutter2Timing?: ShutterTiming;
 };
+
+const average = (input: number[]): number =>
+  input.reduce((sum, currentValue) => sum + currentValue, 0) / input.length;
 
 const averageSensorTimings = (
   measurements: Measurement[],
@@ -22,10 +36,22 @@ const averageSensorTimings = (
   const allIntervals = measurements.map(
     (measurement) => measurement[sensor].close - measurement[sensor].open
   );
-  return allIntervals.length > 0
-    ? allIntervals.reduce((sum, currentValue) => sum + currentValue, 0) /
-        allIntervals.length
-    : 0;
+  return allIntervals.length > 0 ? average(allIntervals) : 0;
+};
+
+type ShutterType = keyof SensorMeasurement;
+
+const averageShutterTimings = (
+  measurements: Measurement[],
+  shutter: ShutterType
+): ShutterTiming => {
+  const timings1 = measurements.map((m) =>
+    Math.abs(m.sensor2[shutter] - m.sensor1[shutter])
+  );
+  const timings2 = measurements.map((m) =>
+    Math.abs(m.sensor3[shutter] - m.sensor2[shutter])
+  );
+  return { "1-2": average(timings1), "2-3": average(timings2) };
 };
 
 const summariseMeasurements = (
@@ -38,6 +64,8 @@ const summariseMeasurements = (
     sensor1: averageSensorTimings(measurements, "sensor1"),
     sensor2: averageSensorTimings(measurements, "sensor2"),
     sensor3: averageSensorTimings(measurements, "sensor3"),
+    shutter1Timing: averageShutterTimings(measurements, "open"),
+    shutter2Timing: averageShutterTimings(measurements, "close"),
   };
 };
 
@@ -49,6 +77,8 @@ export default function SummaryRow({
   measurements,
 }: Props) {
   const summary = summariseMeasurements(measurements);
+  const speedUs = convertSpeedToFloat(speed) * 1000000;
+  const { settings } = useContext(SettingsContext);
 
   return (
     <tr
@@ -60,9 +90,17 @@ export default function SummaryRow({
       </td>
       <td>{speed} s</td>
       <td>{measurements?.length}</td>
-      <td>{displaySpeed(summary.sensor1)}</td>
-      <td>{displaySpeed(summary.sensor2)}</td>
-      <td>{displaySpeed(summary.sensor3)}</td>
+      <Conditional display={settings.sensorData.display}>
+        <td>{displaySpeed(settings.sensorData, summary.sensor1, speedUs)}</td>
+        <td>{displaySpeed(settings.sensorData, summary.sensor2, speedUs)}</td>
+        <td>{displaySpeed(settings.sensorData, summary.sensor3, speedUs)}</td>
+      </Conditional>
+      <Conditional display={settings.shutterData.display}>
+        <td>{microsToMillis(summary.shutter1Timing?.["1-2"], "ms")}</td>
+        <td>{microsToMillis(summary.shutter1Timing?.["2-3"], "ms")}</td>
+        <td>{microsToMillis(summary.shutter2Timing?.["1-2"], "ms")}</td>
+        <td>{microsToMillis(summary.shutter2Timing?.["2-3"], "ms")}</td>
+      </Conditional>
       <td onClick={() => onRemove(speed)} className="remove">
         ❌
       </td>
