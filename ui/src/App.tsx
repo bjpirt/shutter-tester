@@ -1,17 +1,17 @@
 import { useState } from "react";
 import "./App.css";
-import Summary from "./components/Summary";
 import AddSpeed from "./components/AddSpeed";
-import { formatSpeed, sortSpeeds } from "./lib/utils";
-import { defaultSpeeds } from "./lib/defaults";
 import Connect from "./components/Connect";
-import TestShot from "./components/TestShot";
 import MeasurementDetail from "./components/MeasurementDetail";
-import { useBluetooth } from "./lib/useBluetooth";
-import Measurement from "./types/Measurement";
 import SensorControls from "./components/SensorControls";
-import Settings from "./components/Settings";
+import SettingsContext from "./components/SettingsContext";
 import ShutterControls from "./components/ShutterControls";
+import Summary from "./components/Summary";
+import TestShot from "./components/TestShot";
+import { defaultSpeeds } from "./lib/defaults";
+import { useBluetooth } from "./lib/useBluetooth";
+import { formatSpeed, sortSpeeds } from "./lib/utils";
+import Measurement from "./types/Measurement";
 
 const isTest = (): boolean =>
   new URLSearchParams(window.location.search).get("test") === "true";
@@ -31,9 +31,17 @@ function App() {
     setSpeeds([...speeds, formatSpeed(speed)].sort(sortSpeeds));
   };
 
+  const reset = () => {
+    setMeasurements({})
+  }
+
   const selectSpeed = (speed: string) => {
     setSelectedSpeed(speed);
   };
+
+  const removeMeasurement = (speed: string, measurement: Measurement) => {
+    setMeasurements({...measurements, [speed]: measurements[speed].filter(m => m != measurement)});
+  }
 
   const takeShot = (measurement: Measurement) => {
     console.log(measurement);
@@ -52,7 +60,7 @@ function App() {
   };
 
   return (
-    <Settings>
+    <SettingsContext>
       <header>
         {isTest() ? (
           <TestShot onClick={takeShot} selectedSpeed={selectedSpeed} />
@@ -61,6 +69,7 @@ function App() {
         )}
         <SensorControls />
         <ShutterControls />
+        <button onClick={reset}>Reset</button>
       </header>
       <Summary
         speeds={speeds}
@@ -73,8 +82,9 @@ function App() {
       <MeasurementDetail
         measurements={measurements[selectedSpeed]}
         selectedSpeed={selectedSpeed}
+        removeMeasurement={removeMeasurement}
       />
-    </Settings>
+    </SettingsContext>
   );
 }
 

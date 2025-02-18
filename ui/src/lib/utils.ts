@@ -1,4 +1,4 @@
-import { SensorSettings } from "../components/Settings";
+import { SensorSettings } from "../components/SettingsContext";
 
 export const convertSpeedToFloat = (speed: string): number => {
   const splitSpeed = speed.split("/").map((s) => s.trim());

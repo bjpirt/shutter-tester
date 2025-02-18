@@ -5,19 +5,21 @@ import {
   displaySpeed,
 } from "../lib/utils";
 import Measurement from "../types/Measurement";
-import { SettingsContext } from "./Settings";
 import Conditional from "./Conditional";
+import { Context } from "./SettingsContext";
 
 type Props = {
   measurement: Measurement;
   selectedSpeed: string;
+  onRemove: (speed: string, measurement: Measurement) => void
 };
 
 export default function MeasurementDetailRow({
   measurement,
   selectedSpeed,
+  onRemove
 }: Props) {
-  const { settings } = useContext(SettingsContext);
+  const { settings } = useContext(Context);
 
   const speedUs = convertSpeedToFloat(selectedSpeed) * 1000000;
 
@@ -66,6 +68,9 @@ export default function MeasurementDetailRow({
           )}
         </td>
       </Conditional>
+      <td onClick={() => onRemove(selectedSpeed, measurement)} className="remove">
+        ❌
+      </td>
     </tr>
   );
 }

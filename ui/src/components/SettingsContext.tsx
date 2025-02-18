@@ -27,18 +27,18 @@ const defaultSettings: Settings = {
   },
 };
 
-export const SettingsContext = createContext({
+export const Context = createContext({
   settings: defaultSettings,
   setSettings: (_: Settings) => {},
 });
 
-export default function Settings({ children }: React.PropsWithChildren) {
+export default function SettingsContext({ children }: React.PropsWithChildren) {
   const [settings, setSettings] = useState(defaultSettings);
   const settingsContext = { settings, setSettings };
 
   return (
-    <SettingsContext.Provider value={settingsContext}>
+    <Context.Provider value={settingsContext}>
       {children}
-    </SettingsContext.Provider>
+    </Context.Provider>
   );
 }

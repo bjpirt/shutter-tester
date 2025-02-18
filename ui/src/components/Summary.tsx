@@ -1,8 +1,8 @@
 import { useContext } from "react";
 import Measurement from "../types/Measurement";
-import SummaryRow from "./SummaryRow";
-import { SettingsContext } from "./Settings";
 import Conditional from "./Conditional";
+import { Context } from "./SettingsContext";
+import SummaryRow from "./SummaryRow";
 
 type Props = {
   speeds: string[];
@@ -19,7 +19,7 @@ export default function Summary({
   onSelectSpeed,
   measurements,
 }: Props) {
-  const { settings } = useContext(SettingsContext);
+  const { settings } = useContext(Context);
 
   return (
     <table className="summary">

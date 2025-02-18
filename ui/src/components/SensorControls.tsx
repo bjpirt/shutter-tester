@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { Settings, SettingsContext } from "./Settings";
+import { Context, Settings } from "./SettingsContext";
 
 export default function SensorControls() {
-  const { settings, setSettings } = useContext(SettingsContext);
+  const { settings, setSettings } = useContext(Context);
 
   const handleClick = (event: any) => {
     const target = event.target.name;
