@@ -1,6 +1,4 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
   padding: 2rem;
 }
 
@@ -11,4 +9,18 @@
 
 .summary .remove {
   cursor: pointer;
+}
+
+table td{
+  padding: 2px 6px
+}
+
+table tr:nth-child(odd) {
+  background-color: #2b2b2b
+}
+
+header .control{
+  display: inline-block;
+  border:1px solid #666;
+  padding: 3px;
 }

@@ -9,6 +9,9 @@ import TestShot from "./components/TestShot";
 import MeasurementDetail from "./components/MeasurementDetail";
 import { useBluetooth } from "./lib/useBluetooth";
 import Measurement from "./types/Measurement";
+import SensorControls from "./components/SensorControls";
+import Settings from "./components/Settings";
+import ShutterControls from "./components/ShutterControls";
 
 const isTest = (): boolean =>
   new URLSearchParams(window.location.search).get("test") === "true";
@@ -33,6 +36,7 @@ function App() {
   };
 
   const takeShot = (measurement: Measurement) => {
+    console.log(measurement);
     const newMeasurements = structuredClone(measurements);
     if (!Array.isArray(newMeasurements[selectedSpeed])) {
       newMeasurements[selectedSpeed] = [];
@@ -48,12 +52,16 @@ function App() {
   };
 
   return (
-    <>
-      {isTest() ? (
-        <TestShot onClick={takeShot} selectedSpeed={selectedSpeed} />
-      ) : (
-        <Connect onClick={subscribeBluetooth} isConnected={isConnected} />
-      )}
+    <Settings>
+      <header>
+        {isTest() ? (
+          <TestShot onClick={takeShot} selectedSpeed={selectedSpeed} />
+        ) : (
+          <Connect onClick={subscribeBluetooth} isConnected={isConnected} />
+        )}
+        <SensorControls />
+        <ShutterControls />
+      </header>
       <Summary
         speeds={speeds}
         onRemoveSpeed={removeSpeed}
@@ -62,8 +70,11 @@ function App() {
         measurements={measurements}
       />
       <AddSpeed onAddSpeed={addSpeed} />
-      <MeasurementDetail measurements={measurements[selectedSpeed]} />
-    </>
+      <MeasurementDetail
+        measurements={measurements[selectedSpeed]}
+        selectedSpeed={selectedSpeed}
+      />
+    </Settings>
   );
 }
 
