@@ -3,7 +3,7 @@
 #define SENSOR_2 21
 #define SENSOR_3 20
 
-#define TEST_BLUETOOTH
+// #define TEST_BLUETOOTH
 
 #include <BLEDevice.h>
 #include <BLEServer.h>
