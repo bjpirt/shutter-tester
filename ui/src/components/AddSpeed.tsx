@@ -32,9 +32,10 @@ export default function SummaryLine({ onAddSpeed }: Props) {
           type="text"
           onChange={handleChange}
           value={newSpeed}
-          size={10}
+          size={7}
+          placeholder="1/250"
         ></input>
-        <span> s</span>
+        <span> s </span>
         <button>Add speed</button>
         {!!error ? <span>{error}</span> : undefined}
       </form>

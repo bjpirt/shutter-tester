@@ -2,11 +2,10 @@ import { useState } from "react";
 import "./App.css";
 import AddSpeed from "./components/AddSpeed";
 import Connect from "./components/Connect";
-import MeasurementDetail from "./components/MeasurementDetail";
 import SensorControls from "./components/SensorControls";
 import SettingsContext from "./components/SettingsContext";
 import ShutterControls from "./components/ShutterControls";
-import Summary from "./components/Summary";
+import Measurements from "./components/Measurements";
 import TestShot from "./components/TestShot";
 import { defaultSpeeds } from "./lib/defaults";
 import { useBluetooth } from "./lib/useBluetooth";
@@ -82,17 +81,13 @@ function App() {
         <AddSpeed onAddSpeed={addSpeed} />
         <button onClick={reset}>Reset data</button>
       </div>
-      <Summary
+      <Measurements
         speeds={speeds}
         onRemoveSpeed={removeSpeed}
         selectedSpeed={selectedSpeed}
         onSelectSpeed={selectSpeed}
         measurements={measurements}
-      />
-      <MeasurementDetail
-        measurements={measurements[selectedSpeed]}
-        selectedSpeed={selectedSpeed}
-        removeMeasurement={removeMeasurement}
+        onRemoveMeasurement={removeMeasurement}
       />
     </SettingsContext>
   );

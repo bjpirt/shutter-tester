@@ -81,33 +81,35 @@ export default function SummaryRow({
   const { settings } = useContext(Context);
 
   return (
-    <tr
-      onClick={() => onSelect(speed)}
-      className={selected ? "selected" : undefined}
-    >
-      <td>
-        <input
-          type="checkbox"
-          checked={selected}
-          onChange={() => onSelect(speed)}
-        />
-      </td>
-      <td>{speed} s</td>
-      <td>{measurements?.length}</td>
-      <Conditional display={settings.sensorData.display}>
-        <td>{displaySpeed(settings.sensorData, summary.sensor1, speedUs)}</td>
-        <td>{displaySpeed(settings.sensorData, summary.sensor2, speedUs)}</td>
-        <td>{displaySpeed(settings.sensorData, summary.sensor3, speedUs)}</td>
-      </Conditional>
-      <Conditional display={settings.shutterData.display}>
-        <td>{microsToMillis(summary.shutter1Timing?.["1-2"], "ms")}</td>
-        <td>{microsToMillis(summary.shutter1Timing?.["2-3"], "ms")}</td>
-        <td>{microsToMillis(summary.shutter2Timing?.["1-2"], "ms")}</td>
-        <td>{microsToMillis(summary.shutter2Timing?.["2-3"], "ms")}</td>
-      </Conditional>
-      <td onClick={() => onRemove(speed)} className="remove">
-        ❌
-      </td>
-    </tr>
+    <>
+      <tr
+        onClick={() => onSelect(speed)}
+        className={selected ? "selected" : undefined}
+      >
+        <td>
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => onSelect(speed)}
+          />
+        </td>
+        <td>{speed} s</td>
+        <td>{measurements?.length}</td>
+        <Conditional display={settings.sensorData.display}>
+          <td>{displaySpeed(settings.sensorData, summary.sensor1, speedUs)}</td>
+          <td>{displaySpeed(settings.sensorData, summary.sensor2, speedUs)}</td>
+          <td>{displaySpeed(settings.sensorData, summary.sensor3, speedUs)}</td>
+        </Conditional>
+        <Conditional display={settings.shutterData.display}>
+          <td>{microsToMillis(summary.shutter1Timing?.["1-2"], "ms")}</td>
+          <td>{microsToMillis(summary.shutter1Timing?.["2-3"], "ms")}</td>
+          <td>{microsToMillis(summary.shutter2Timing?.["1-2"], "ms")}</td>
+          <td>{microsToMillis(summary.shutter2Timing?.["2-3"], "ms")}</td>
+        </Conditional>
+        <td onClick={() => onRemove(speed)} className="remove">
+          ❌
+        </td>
+      </tr>
+    </>
   );
 }

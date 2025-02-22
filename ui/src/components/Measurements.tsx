@@ -2,7 +2,8 @@ import { useContext } from "react";
 import Measurement from "../types/Measurement";
 import Conditional from "./Conditional";
 import { Context } from "./SettingsContext";
-import SummaryRow from "./SummaryRow";
+import MeasurementSummaryRow from "./MeasurementSummaryRow";
+import MeasurementDetailRow from "./MeasurementDetailRow";
 
 type Props = {
   speeds: string[];
@@ -10,12 +11,14 @@ type Props = {
   onRemoveSpeed: (speed: string) => void;
   onSelectSpeed: (speed: string) => void;
   measurements: Record<string, Measurement[]>;
+  onRemoveMeasurement: (speed: string, measurement: Measurement) => void;
 };
 
-export default function Summary({
+export default function Measurements({
   speeds,
   onRemoveSpeed,
   selectedSpeed,
+  onRemoveMeasurement,
   onSelectSpeed,
   measurements,
 }: Props) {
@@ -43,16 +46,33 @@ export default function Summary({
         </tr>
       </thead>
       <tbody>
-        {speeds.map((speed) => (
-          <SummaryRow
-            key={speed}
-            speed={speed}
-            selected={speed === selectedSpeed}
-            onSelect={onSelectSpeed}
-            onRemove={onRemoveSpeed}
-            measurements={measurements[speed ?? ""]}
-          />
-        ))}
+        {speeds.map((speed) => {
+          const selected = speed === selectedSpeed;
+          const selectedMeasurements = measurements[speed ?? ""];
+
+          return (
+            <>
+              <MeasurementSummaryRow
+                key={speed}
+                speed={speed}
+                selected={selected}
+                onSelect={onSelectSpeed}
+                onRemove={onRemoveSpeed}
+                measurements={selectedMeasurements}
+              />
+
+              {selected
+                ? selectedMeasurements?.map((m) => (
+                    <MeasurementDetailRow
+                      measurement={m}
+                      selectedSpeed={speed}
+                      onRemove={() => onRemoveMeasurement(speed, m)}
+                    />
+                  ))
+                : undefined}
+            </>
+          );
+        })}
       </tbody>
     </table>
   );
