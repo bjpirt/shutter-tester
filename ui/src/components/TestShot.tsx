@@ -29,5 +29,9 @@ export default function TestShot({ onClick, selectedSpeed }: Props) {
     onClick(generateTestData(selectedSpeed));
   };
 
-  return <button onClick={handleClick}>Test</button>;
+  return (
+    <button onClick={handleClick} className="action">
+      Test
+    </button>
+  );
 }

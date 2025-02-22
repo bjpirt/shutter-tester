@@ -1,5 +1,5 @@
 #root {
-  padding: 2rem;
+  padding: 1rem;
 }
 
 
@@ -19,8 +19,43 @@ table tr:nth-child(odd) {
   background-color: #2b2b2b
 }
 
-header .control{
+#controls .control{
   display: inline-block;
-  border:1px solid #666;
-  padding: 3px;
+  padding: 4px;
+}
+
+.control label{
+  margin-right: 5px
+}
+
+.control {
+  margin-right:20px
+}
+
+#controls button {
+  padding: 0.3em 0.5em;
+}
+
+.connect {
+  margin-top: 17px;
+  float: right;
+}
+
+button.action{
+  background-color:#107b11;
+  color:#FFF
+}
+
+
+button:hover {
+  border-color: #60a362;
+}
+
+h1{
+  margin:0 0 20px;
+  font-size:2.75em
+}
+
+h1 .icon {
+  font-size:130%
 }

@@ -32,16 +32,19 @@ function App() {
   };
 
   const reset = () => {
-    setMeasurements({})
-  }
+    setMeasurements({});
+  };
 
   const selectSpeed = (speed: string) => {
     setSelectedSpeed(speed);
   };
 
   const removeMeasurement = (speed: string, measurement: Measurement) => {
-    setMeasurements({...measurements, [speed]: measurements[speed].filter(m => m != measurement)});
-  }
+    setMeasurements({
+      ...measurements,
+      [speed]: measurements[speed].filter((m) => m != measurement),
+    });
+  };
 
   const takeShot = (measurement: Measurement) => {
     console.log(measurement);
@@ -62,15 +65,23 @@ function App() {
   return (
     <SettingsContext>
       <header>
-        {isTest() ? (
-          <TestShot onClick={takeShot} selectedSpeed={selectedSpeed} />
-        ) : (
-          <Connect onClick={subscribeBluetooth} isConnected={isConnected} />
-        )}
+        <div className="connect">
+          {isTest() ? (
+            <TestShot onClick={takeShot} selectedSpeed={selectedSpeed} />
+          ) : (
+            <Connect onClick={subscribeBluetooth} isConnected={isConnected} />
+          )}
+        </div>
+        <h1>
+          <span className="icon">📷</span> Shutter Tester
+        </h1>
+      </header>
+      <div id="controls">
         <SensorControls />
         <ShutterControls />
-        <button onClick={reset}>Reset</button>
-      </header>
+        <AddSpeed onAddSpeed={addSpeed} />
+        <button onClick={reset}>Reset data</button>
+      </div>
       <Summary
         speeds={speeds}
         onRemoveSpeed={removeSpeed}
@@ -78,7 +89,6 @@ function App() {
         onSelectSpeed={selectSpeed}
         measurements={measurements}
       />
-      <AddSpeed onAddSpeed={addSpeed} />
       <MeasurementDetail
         measurements={measurements[selectedSpeed]}
         selectedSpeed={selectedSpeed}

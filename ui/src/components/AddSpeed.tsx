@@ -26,11 +26,18 @@ export default function SummaryLine({ onAddSpeed }: Props) {
     setNewSpeed(e.currentTarget.value);
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" onChange={handleChange} value={newSpeed}></input>
-      <span>s</span>
-      <button>Add speed</button>
-      {!!error ? <span>{error}</span> : undefined}
-    </form>
+    <div className="control">
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          onChange={handleChange}
+          value={newSpeed}
+          size={10}
+        ></input>
+        <span> s</span>
+        <button>Add speed</button>
+        {!!error ? <span>{error}</span> : undefined}
+      </form>
+    </div>
   );
 }

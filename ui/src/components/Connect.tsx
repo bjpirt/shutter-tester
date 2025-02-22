@@ -5,6 +5,8 @@ type Props = {
 
 export default function Connect({ onClick, isConnected }: Props) {
   return (
-    <button onClick={onClick}>{isConnected ? "Connected" : "Connect"}</button>
+    <button onClick={onClick} className="action">
+      {isConnected ? "Connected" : "Connect"}
+    </button>
   );
 }

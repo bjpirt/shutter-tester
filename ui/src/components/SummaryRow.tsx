@@ -86,7 +86,11 @@ export default function SummaryRow({
       className={selected ? "selected" : undefined}
     >
       <td>
-        <input type="checkbox" checked={selected} />
+        <input
+          type="checkbox"
+          checked={selected}
+          onChange={() => onSelect(speed)}
+        />
       </td>
       <td>{speed} s</td>
       <td>{measurements?.length}</td>
