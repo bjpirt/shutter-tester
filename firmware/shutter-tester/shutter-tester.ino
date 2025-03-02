@@ -57,12 +57,18 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
-class MyCharacteristicCallbacks : public BLECharacteristicCallbacks {
+class ModeCharacteristicCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic *pModeCharacteristic) {
     String value = pModeCharacteristic->getValue();
     if (value.length() > 0) {
-      Serial.print("Characteristic event, written: ");
-      Serial.println(static_cast<int>(value[0]));  // Print the integer value
+      int newMode = static_cast<int>(value[0]);
+      if (newMode == 1) {
+        Serial.print("Setting mode to single point");
+        mode = SINGLE_POINT;
+      } else if (newMode == 2) {
+        Serial.print("Setting mode to three point");
+        mode = THREE_POINT;
+      }
     }
   }
 };
@@ -173,7 +179,7 @@ void setupBluetooth() {
     MODE_CHARACTERISTIC_UUID,
     BLECharacteristic::PROPERTY_WRITE);
 
-  pModeCharacteristic->setCallbacks(new MyCharacteristicCallbacks());
+  pModeCharacteristic->setCallbacks(new ModeCharacteristicCallbacks());
 
   // Create a BLE Descriptor
   pSensorCharacteristic->addDescriptor(new BLE2902());
@@ -241,7 +247,7 @@ void three_point_output() {
   }
 }
 
-char* getMode() {
+char *getMode() {
   if (mode == THREE_POINT) {
     return "three_point";
   } else if (mode == SINGLE_POINT) {
@@ -272,7 +278,9 @@ void single_point_output() {
 }
 
 void loop() {
-  if (sensor1_state == WAIT_FOR_CLOSE || sensor2_state == WAIT_FOR_CLOSE || sensor3_state == WAIT_FOR_CLOSE) {
+  if ((mode == THREE_POINT && (sensor1_state == sensor2_state == sensor3_state == WAIT_FOR_CLOSE)) || (mode == SINGLE_POINT && sensor2_state == WAIT_FOR_CLOSE)) {
+    digitalWrite(LED, LOW);
+  }else{
     digitalWrite(LED, HIGH);
   }
 

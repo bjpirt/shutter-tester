@@ -48,6 +48,7 @@ function App() {
 
   const reset = () => {
     setThreePointMeasurements({});
+    setSinglePointMeasurements({});
   };
 
   const selectSpeed = (speed: string) => {
@@ -105,7 +106,7 @@ function App() {
     }
   };
 
-  const { subscribe, isConnected } = useBluetooth(handleMessage);
+  const { setMode, subscribe, isConnected } = useBluetooth(handleMessage);
 
   const subscribeBluetooth = () => {
     subscribe();
@@ -130,7 +131,7 @@ function App() {
         </h1>
       </header>
       <div id="controls">
-        <ModeControl />
+        <ModeControl onChange={setMode} />
         <AddSpeed onAddSpeed={addSpeed} />
         <SensorControls />
         <ShutterControls />

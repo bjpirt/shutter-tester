@@ -2,11 +2,17 @@ import { useContext } from "react";
 import { Context } from "./SettingsContext";
 import { Mode } from "../types/Message";
 
-export default function ModeControl() {
+type Props = {
+  onChange: (mode: Mode) => Promise<void>;
+};
+
+export default function ModeControl({ onChange }: Props) {
   const { settings, setSettings } = useContext(Context);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSettings({ ...settings, mode: event.target.value as Mode });
+    const newMode = event.target.value as Mode;
+    setSettings({ ...settings, mode: newMode });
+    onChange(newMode);
   };
 
   return (
