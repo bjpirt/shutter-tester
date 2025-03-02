@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { Mode } from "../types/Message";
 
 export type SensorSettings = {
   milliseconds: boolean;
@@ -7,6 +8,7 @@ export type SensorSettings = {
 };
 
 export type Settings = {
+  mode: Mode;
   sensorData: SensorSettings & {
     display: boolean;
   };
@@ -16,6 +18,7 @@ export type Settings = {
 };
 
 const defaultSettings: Settings = {
+  mode: Mode.THREE_POINT,
   sensorData: {
     display: true,
     milliseconds: false,
@@ -37,8 +40,6 @@ export default function SettingsContext({ children }: React.PropsWithChildren) {
   const settingsContext = { settings, setSettings };
 
   return (
-    <Context.Provider value={settingsContext}>
-      {children}
-    </Context.Provider>
+    <Context.Provider value={settingsContext}>{children}</Context.Provider>
   );
 }

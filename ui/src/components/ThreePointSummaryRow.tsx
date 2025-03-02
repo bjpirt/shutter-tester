@@ -4,7 +4,7 @@ import {
   displaySpeed,
   microsToMillis,
 } from "../lib/utils";
-import Measurement, { SensorMeasurement } from "../types/Measurement";
+import { SensorMeasurement, ThreePointMeasurement } from "../types/Message";
 import Conditional from "./Conditional";
 import { Context } from "./SettingsContext";
 
@@ -13,7 +13,7 @@ type Props = {
   selected: boolean;
   onSelect: (speed: string) => void;
   onRemove: (speed: string) => void;
-  measurements?: Measurement[];
+  measurements?: ThreePointMeasurement[];
 };
 
 type ShutterTiming = { "1-2": number; "2-3": number };
@@ -30,8 +30,8 @@ const average = (input: number[]): number =>
   input.reduce((sum, currentValue) => sum + currentValue, 0) / input.length;
 
 const averageSensorTimings = (
-  measurements: Measurement[],
-  sensor: keyof Measurement
+  measurements: ThreePointMeasurement[],
+  sensor: keyof ThreePointMeasurement
 ): number => {
   const allIntervals = measurements.map(
     (measurement) => measurement[sensor].close - measurement[sensor].open
@@ -42,7 +42,7 @@ const averageSensorTimings = (
 type ShutterType = keyof SensorMeasurement;
 
 const averageShutterTimings = (
-  measurements: Measurement[],
+  measurements: ThreePointMeasurement[],
   shutter: ShutterType
 ): ShutterTiming => {
   const timings1 = measurements.map((m) =>
@@ -55,7 +55,7 @@ const averageShutterTimings = (
 };
 
 const summariseMeasurements = (
-  measurements?: Measurement[]
+  measurements?: ThreePointMeasurement[]
 ): MeasurementSummary => {
   if (!measurements) {
     return {};
@@ -69,7 +69,7 @@ const summariseMeasurements = (
   };
 };
 
-export default function SummaryRow({
+export default function ThreePointSummaryRow({
   speed,
   selected,
   onSelect,

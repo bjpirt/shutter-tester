@@ -1,5 +1,6 @@
 import * as React from "react";
-import Measurement from "../types/Measurement";
+import { messageSchema } from "../types/Message";
+import Message from "../types/Message";
 
 var deviceName = "ShutterTester";
 var bleService = "42de79f1-7248-4c9b-9279-96509b8a9f5c";
@@ -10,11 +11,9 @@ export interface Bluetooth {
   subscribe: () => void;
 }
 
-export const useBluetooth = (
-  eventHandler: (x: Measurement) => void
-): Bluetooth => {
+export const useBluetooth = (eventHandler: (x: Message) => void): Bluetooth => {
   const [isConnected, setIsConnected] = React.useState(false);
-  const eventHandlerRef = React.useRef<(x: Measurement) => void>();
+  const eventHandlerRef = React.useRef<(x: Message) => void>();
 
   React.useEffect(() => {
     eventHandlerRef.current = eventHandler;
@@ -22,7 +21,6 @@ export const useBluetooth = (
 
   const subscribe = async () => {
     try {
-      // setCallback(callback);
       const device = await navigator.bluetooth
         .requestDevice({
           filters: [{ name: deviceName }, { services: [bleService] }],
@@ -41,10 +39,8 @@ export const useBluetooth = (
         "characteristicvaluechanged",
         (event: any) => {
           const newValueReceived = new TextDecoder().decode(event.target.value);
-          eventHandlerRef.current &&
-            eventHandlerRef.current(
-              JSON.parse(newValueReceived) as Measurement
-            );
+          const data = messageSchema.parse(newValueReceived);
+          eventHandlerRef.current && eventHandlerRef.current(data);
         }
       );
 
