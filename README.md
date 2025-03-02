@@ -27,13 +27,31 @@ The BoM is quite low cost and relatively minimal:
 
 The main thing to take care over during assembly is to ensure the lens of the light sensor aligns to the small hole in the PCB that allows the light through. The three legs of the sensor should be bent down slightly so that they can solder onto the three pads on the PCB.
 
-The capacitors and resistors can be easily hand soldered (a finer soldering iron tip helps here) by applying solder to one of the pads on the PCB, using tweezers, solder one end of the component to the soldered pad on the PCB, then solder the other end once it is held in place. If you're experienced in surface mounting you could always use solder paste, but it's pretty straightforward without this. There are markings on the board for which component goes where (C1, C2 and C3 for the capacitors, Resistor values are marked 1k and 2k)
+The capacitors and resistors can be easily hand soldered (a finer soldering iron tip helps here) by applying solder to one of the pads on the PCB, using tweezers, solder one end of the component to the soldered pad on the PCB, then solder the other end once it is held in place. If you're experienced in surface mounting you could always use solder paste, but it's pretty straightforward without this. There are markings on the board for which component goes where (C1, C2 and C3 for the capacitors, Resistor values are marked 1k and 2k). The capacitors are optional and may be removed in a future iteration.
 
 It's best to test the ESP32 module before soldering to ensure it's working fine. Program this using the sketch included and make sure it is outputting "Ready to measure" on the serial console (running at 921600 baud).
 
 ## Usage
 
-Attach the shutter tester behind the shutter of the camera. It's best to open the shutter before doing this so you can align it more easily so set the shutter to "Bulb" and open it. Remove the lens (if possible) and place a strong, even light at the front of the camera. You can use a full size bulb for this so long as it is the type that has a white diffuser bulb, not clear. Basically you want to ensure that light can pass directly through the three holes to reach the sensors, not at an angle.
+Attach the shutter tester behind the shutter of the camera (I normally use 2 - 3 small blobs of Blu-Tak which works well). You can use the three larger holes in the tester to align with the edges of the shutter aperture. Open the shutter once you've this so you can check it's properly positioned by setting the shutter to "Bulb" and opening it. Remove the lens (if possible) and place a strong, even light at the front of the camera. You can use a full size bulb for this so long as it is the type that has a white diffuser bulb, not clear. Basically you want to ensure that light can pass directly through the three holes to reach the sensors, not at an angle. I've also had good results with a small USB powered LED panel.
+
+### Using Bluetooth
+
+There is a user interface that connects to the ESP32 from a Chrome web browser directly and lets you analyse all of the measurements quite easily.
+
+![The Bluetooth user interface](./docs/images/ui.jpg "The Bluetooth user interface")
+
+At the moment you need to run this locally. Steps:
+
+- Install Node.js (v22)
+- Open a terminal in the `ui` folder of this repository
+- run `npm install`
+- run `npm run dev`
+- Go to the URL printed in your terminal ([http://localhost:5173/](http://localhost:5173/))
+
+You should then be able to click the `Connect` button and pair with your shutter tester. Select the speed you want to test, set up the light and fire the shutter. The new reading should appear in the table.
+
+### Using serial
 
 Open a serial terminal to the ESP32 (this is built in to the Arduino IDE). You'll need to connect at 921600 baud.
 
