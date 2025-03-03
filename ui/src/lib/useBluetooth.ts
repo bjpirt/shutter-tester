@@ -1,20 +1,23 @@
 import * as React from "react";
-import Measurement from "../types/Measurement";
+import { messageSchema, Mode } from "../types/Message";
+import Message from "../types/Message";
 
 var deviceName = "ShutterTester";
-var bleService = "42de79f1-7248-4c9b-9279-96509b8a9f5c";
-var sensorCharacteristic = "42de79f1-7248-4c9b-9279-96509b8a9f5d";
+var bleServiceId = "42de79f1-7248-4c9b-9279-96509b8a9f5c";
+var sensorCharacteristicId = "42de79f1-7248-4c9b-9279-96509b8a9f5d";
+var modeCharacteristicId = "42de79f1-7248-4c9b-9279-96509b8a9f5e";
 
 export interface Bluetooth {
   isConnected: boolean;
   subscribe: () => void;
+  setMode: (mode: Mode) => Promise<void>;
 }
 
-export const useBluetooth = (
-  eventHandler: (x: Measurement) => void
-): Bluetooth => {
+export const useBluetooth = (eventHandler: (x: Message) => void): Bluetooth => {
   const [isConnected, setIsConnected] = React.useState(false);
-  const eventHandlerRef = React.useRef<(x: Measurement) => void>();
+  const [modeCharacteristic, setModeCharacteristic] =
+    React.useState<BluetoothRemoteGATTCharacteristic | null>(null);
+  const eventHandlerRef = React.useRef<(x: Message) => void>();
 
   React.useEffect(() => {
     eventHandlerRef.current = eventHandler;
@@ -22,29 +25,44 @@ export const useBluetooth = (
 
   const subscribe = async () => {
     try {
-      // setCallback(callback);
-      const device = await navigator.bluetooth
+      const device: BluetoothDevice | Error = await navigator.bluetooth
         .requestDevice({
-          filters: [{ name: deviceName }, { services: [bleService] }],
-          optionalServices: [bleService],
+          filters: [{ name: deviceName }, { services: [bleServiceId] }],
+          optionalServices: [bleServiceId],
         })
         .catch((e) => e);
+
+      if (device instanceof Error) {
+        throw device;
+      }
+
+      device.addEventListener("gattserverdisconnected", () =>
+        setIsConnected(false)
+      );
+
       const server = await device.gatt?.connect().catch((e: Error) => e);
 
-      const service = await server?.getPrimaryService(bleService);
+      if (server instanceof Error) {
+        throw server;
+      }
+
+      const service = await server?.getPrimaryService(bleServiceId);
 
       const characteristic = await service?.getCharacteristic(
-        sensorCharacteristic
+        sensorCharacteristicId
       );
+
+      const modeChar = await service?.getCharacteristic(modeCharacteristicId);
+      if (modeChar) {
+        setModeCharacteristic(modeChar);
+      }
 
       characteristic?.addEventListener(
         "characteristicvaluechanged",
         (event: any) => {
           const newValueReceived = new TextDecoder().decode(event.target.value);
-          eventHandlerRef.current &&
-            eventHandlerRef.current(
-              JSON.parse(newValueReceived) as Measurement
-            );
+          const data = messageSchema.parse(JSON.parse(newValueReceived));
+          eventHandlerRef.current && eventHandlerRef.current(data);
         }
       );
 
@@ -56,5 +74,12 @@ export const useBluetooth = (
     }
   };
 
-  return { subscribe, isConnected };
+  const setMode = async (mode: Mode) => {
+    const modeValue = [null, Mode.SINGLE_POINT, Mode.THREE_POINT].indexOf(mode);
+    if (modeCharacteristic) {
+      await modeCharacteristic.writeValue(Uint8Array.of(modeValue));
+    }
+  };
+
+  return { setMode, subscribe, isConnected };
 };

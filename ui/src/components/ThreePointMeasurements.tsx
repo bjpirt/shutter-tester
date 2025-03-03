@@ -1,20 +1,23 @@
 import { useContext } from "react";
-import Measurement from "../types/Measurement";
+import { ThreePointMeasurement } from "../types/Message";
 import Conditional from "./Conditional";
 import { Context } from "./SettingsContext";
-import MeasurementSummaryRow from "./MeasurementSummaryRow";
-import MeasurementDetailRow from "./MeasurementDetailRow";
+import ThreePointSummaryRow from "./ThreePointSummaryRow";
+import ThreePointDetailRow from "./ThreePointDetailRow";
 
 type Props = {
   speeds: string[];
   selectedSpeed: null | string;
   onRemoveSpeed: (speed: string) => void;
   onSelectSpeed: (speed: string) => void;
-  measurements: Record<string, Measurement[]>;
-  onRemoveMeasurement: (speed: string, measurement: Measurement) => void;
+  measurements: Record<string, ThreePointMeasurement[]>;
+  onRemoveMeasurement: (
+    speed: string,
+    measurement: ThreePointMeasurement
+  ) => void;
 };
 
-export default function Measurements({
+export default function ThreePointMeasurements({
   speeds,
   onRemoveSpeed,
   selectedSpeed,
@@ -52,7 +55,7 @@ export default function Measurements({
 
           return (
             <>
-              <MeasurementSummaryRow
+              <ThreePointSummaryRow
                 key={speed}
                 speed={speed}
                 selected={selected}
@@ -63,7 +66,7 @@ export default function Measurements({
 
               {selected
                 ? selectedMeasurements?.map((m) => (
-                    <MeasurementDetailRow
+                    <ThreePointDetailRow
                       measurement={m}
                       selectedSpeed={speed}
                       onRemove={() => onRemoveMeasurement(speed, m)}

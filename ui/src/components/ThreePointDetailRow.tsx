@@ -4,17 +4,17 @@ import {
   displayInterval,
   displaySpeed,
 } from "../lib/utils";
-import Measurement from "../types/Measurement";
+import { ThreePointMeasurement } from "../types/Message";
 import Conditional from "./Conditional";
 import { Context } from "./SettingsContext";
 
 type Props = {
-  measurement: Measurement;
+  measurement: ThreePointMeasurement;
   selectedSpeed: string;
-  onRemove: (speed: string, measurement: Measurement) => void;
+  onRemove: (speed: string, measurement: ThreePointMeasurement) => void;
 };
 
-export default function MeasurementDetailRow({
+export default function ThreePointDetailRow({
   measurement,
   selectedSpeed,
   onRemove,
