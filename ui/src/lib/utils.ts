@@ -11,7 +11,7 @@ export const convertSpeedToFloat = (speed: string): number => {
 
 export const convertMicrosToFraction = (microseconds: number): string => {
   const seconds = microseconds / 1000000;
-  const fractionSeconds = Math.round(1 / seconds);
+  const fractionSeconds = (1 / seconds).toFixed(1);
   return seconds >= 1 ? seconds.toFixed(2) : `1/${fractionSeconds}`;
 };
 
