@@ -29,7 +29,7 @@ export default function SensorControls() {
         checked={settings.sensorData.display}
         onChange={handleClick}
       ></input>
-      <label htmlFor="display">Sensor Data</label>
+      <label htmlFor="display">Sensor Timing</label>
       <input
         type="checkbox"
         name="milliseconds"

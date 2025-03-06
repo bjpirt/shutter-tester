@@ -27,7 +27,7 @@ export default function SensorControls() {
         checked={settings.shutterData.display}
         onChange={handleClick}
       ></input>
-      <label htmlFor="display">Shutter Data</label>
+      <label htmlFor="display">Shutter Timing</label>
     </div>
   );
 }
