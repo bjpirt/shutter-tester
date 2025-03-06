@@ -76,3 +76,21 @@ Sensor 3: 5528 uS || 5.5 mS || 1 / 182
 In this example, the time taken for the first shutter to travel between the first and second (centre) sensors was 16582 microseconds and 12632 microseconds between the second (centre) and third sensor. You can see that in this example the second shutter is slow and would need adjusting.
 
 Looking at the exposure time at each sensor, you can see the timings would need adjusting to give a good even exposure. First you would adjust the shutter timings to try and get them similar and then adjust both shutter tensioners to get the exposure time to match the expected (in this case it should have been 1/250 S)
+
+# To Do
+
+- [ ] Compensation for sensor width
+- [ ] Enable detailed measurements to be shown / hidden
+- [ ] Deploy to GitHub pages using GitHub actions
+- [ ] Display full shutter timing
+- [ ] Add a simple mode that just displays readings without calculations
+- [ ] More display options for summarising the measurements
+- [ ] Calculate variations across shutter and whether they are within tolerances
+- [ ] Add graph visualisation of shutter speeds
+
+## Future
+
+- [ ] Add persistence in the browser to enable common presets to be stored - e.g. camera types with speeds
+- [ ] Enable different "runs" to be stored and compared so you can see progression when adjusting
+- [ ] Add exposure measurement with light to frequency sensor
+- [ ] Investigate reflective measurement from front of camera for e.g. Barnack Leicas
