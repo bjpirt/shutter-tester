@@ -1,26 +1,26 @@
 import { useContext, useState } from "react";
 import "./App.css";
 import AddSpeed from "./components/AddSpeed";
+import CompensationControls from "./components/CompensationControls";
+import Conditional from "./components/Conditional";
 import Connect from "./components/Connect";
+import ModeControl from "./components/ModeControl";
 import SensorControls from "./components/SensorControls";
+import { Context } from "./components/SettingsContext";
 import ShutterControls from "./components/ShutterControls";
-import ThreePointMeasurements from "./components/ThreePointMeasurements";
+import SinglePointMeasurements from "./components/SinglePointMeasurements";
 import TestShot from "./components/TestShot";
+import ThreePointMeasurements from "./components/ThreePointMeasurements";
 import { defaultSpeeds } from "./lib/defaults";
 import { useBluetooth } from "./lib/useBluetooth";
 import { formatSpeed, sortSpeeds } from "./lib/utils";
-import {
+import Message, {
   MetadataMessage,
   Mode,
   SinglePointMessage,
   ThreePointMeasurement,
   ThreePointMessage,
 } from "./types/Message";
-import Message from "./types/Message";
-import SinglePointMeasurements from "./components/SinglePointMeasurements";
-import Conditional from "./components/Conditional";
-import ModeControl from "./components/ModeControl";
-import { Context } from "./components/SettingsContext";
 
 const isDemo = (): boolean =>
   new URLSearchParams(window.location.search).get("demo") === "true";
@@ -135,6 +135,7 @@ function App() {
         <AddSpeed onAddSpeed={addSpeed} />
         <SensorControls />
         <ShutterControls />
+        <CompensationControls />
         <button onClick={reset}>Reset data</button>
       </div>
       <Conditional display={settings.mode === Mode.THREE_POINT}>

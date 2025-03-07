@@ -1,10 +1,11 @@
 import { useContext } from "react";
+import processThreePointMeasurement from "../lib/processThreePointMeasurement";
 import {
   convertSpeedToFloat,
   displayInterval,
   displaySpeed,
 } from "../lib/utils";
-import { ThreePointMeasurement } from "../types/Message";
+import { ThreePointMeasurement } from "../types/Measurement";
 import Conditional from "./Conditional";
 import { Context } from "./SettingsContext";
 
@@ -23,6 +24,8 @@ export default function ThreePointDetailRow({
 
   const speedUs = convertSpeedToFloat(selectedSpeed) * 1000000;
 
+  const processedMeasurement = processThreePointMeasurement(measurement, settings.compensation);
+
   return (
     <tr className="measurement-detail">
       <Conditional display={settings.sensorData.display}>
@@ -32,44 +35,30 @@ export default function ThreePointDetailRow({
         <td>
           {displaySpeed(
             settings.sensorData,
-            measurement.sensor1.close - measurement.sensor1.open,
+            processedMeasurement.sensor1,
             speedUs
           )}
         </td>
         <td>
           {displaySpeed(
             settings.sensorData,
-            measurement.sensor2.close - measurement.sensor2.open,
+            processedMeasurement.sensor2,
             speedUs
           )}
         </td>
         <td>
           {displaySpeed(
             settings.sensorData,
-            measurement.sensor3.close - measurement.sensor3.open,
+            processedMeasurement.sensor3,
             speedUs
           )}
         </td>
       </Conditional>
       <Conditional display={settings.shutterData.display}>
-        <td>
-          {displayInterval(measurement.sensor2.open, measurement.sensor1.open)}
-        </td>
-        <td>
-          {displayInterval(measurement.sensor3.open, measurement.sensor2.open)}
-        </td>
-        <td>
-          {displayInterval(
-            measurement.sensor2.close,
-            measurement.sensor1.close
-          )}
-        </td>
-        <td>
-          {displayInterval(
-            measurement.sensor3.close,
-            measurement.sensor2.close
-          )}
-        </td>
+        <td>{displayInterval(processedMeasurement.shutter1.side1)}</td>
+        <td>{displayInterval(processedMeasurement.shutter1.side2)}</td>
+        <td>{displayInterval(processedMeasurement.shutter2.side1)}</td>
+        <td>{displayInterval(processedMeasurement.shutter2.side2)}</td>
       </Conditional>
       <td
         onClick={() => onRemove(selectedSpeed, measurement)}

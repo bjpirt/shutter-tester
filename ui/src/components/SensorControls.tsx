@@ -4,7 +4,7 @@ import { Context, Settings } from "./SettingsContext";
 export default function SensorControls() {
   const { settings, setSettings } = useContext(Context);
 
-  const handleClick = (event: any) => {
+  const handleClick = (event: React.ChangeEvent<HTMLInputElement >) => {
     const target = event.target.name;
     if (target in settings.sensorData) {
       const oldValue =

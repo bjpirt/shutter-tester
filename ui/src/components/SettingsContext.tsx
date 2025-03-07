@@ -8,6 +8,7 @@ export type SensorSettings = {
 };
 
 export type Settings = {
+  compensation: boolean
   mode: Mode;
   sensorData: SensorSettings & {
     display: boolean;
@@ -18,6 +19,7 @@ export type Settings = {
 };
 
 const defaultSettings: Settings = {
+  compensation: true,
   mode: Mode.THREE_POINT,
   sensorData: {
     display: true,

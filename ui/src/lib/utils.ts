@@ -55,11 +55,8 @@ export const displaySpeed = (
   return output.join(" ");
 };
 
-export const displayInterval = (t1?: number, t2?: number): string => {
-  if (t1 === undefined || t2 === undefined) {
-    return "-";
-  }
-  return `${(Math.abs(t2 - t1) / 1000).toFixed(2)}ms`;
+export const displayInterval = (time: number): string => {
+  return `${(time / 1000).toFixed(2)}ms`;
 };
 
 export const microsToMillis = (input?: number, units?: string): string =>

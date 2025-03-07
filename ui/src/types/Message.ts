@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { threePointMeasurementSchema } from "./Measurement";
 
 export enum Mode {
   THREE_POINT = "three_point",
@@ -11,12 +12,7 @@ export enum MessageType {
   METADATA = "metadata",
 }
 
-const sensorMeasurementSchema = z.object({
-  open: z.number(),
-  close: z.number(),
-});
 
-export type SensorMeasurement = z.infer<typeof sensorMeasurementSchema>;
 
 const singlePointMessageSchema = z.object({
   type: z.literal("single_point"),
@@ -25,13 +21,6 @@ const singlePointMessageSchema = z.object({
 
 export type SinglePointMessage = z.infer<typeof singlePointMessageSchema>;
 
-const threePointMeasurementSchema = z.object({
-  sensor1: sensorMeasurementSchema,
-  sensor2: sensorMeasurementSchema,
-  sensor3: sensorMeasurementSchema,
-});
-
-export type ThreePointMeasurement = z.infer<typeof threePointMeasurementSchema>;
 
 const threePointMessageSchema = threePointMeasurementSchema.extend({
   type: z.literal("three_point"),
