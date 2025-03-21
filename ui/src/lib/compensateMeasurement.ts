@@ -2,7 +2,9 @@ import { ProcessedThreePointMeasurement } from "../types/Measurement"
 
 export const compensateMeasurement = (measurement: ProcessedThreePointMeasurement, width: number = 32, compensationWidth: number = 1): ProcessedThreePointMeasurement => {
   // Using a simple linear extrapolation, work out the shutter width at the three measurement points
-  // The assumption is that both shutters are travelling at similar speeds so we will use an average
+  // The assumption is that both shutters are travelling at similar speeds (if they're not, that needs
+  // calibrating before using three point readings) so we will use an average
+
   // First, work out the speed at the two centre points between the three sensors
   const shutter1Side1Speed = (width / 2) / measurement.shutter1.side1
   const shutter1Side2Speed = (width / 2) / measurement.shutter1.side2
@@ -10,13 +12,13 @@ export const compensateMeasurement = (measurement: ProcessedThreePointMeasuremen
   const shutter2Side2Speed = (width / 2) / measurement.shutter2.side2
 
   // Next, extrapolate the speed at the three sensor points for both curtains
-  const shutter1Sensor1Speed = shutter1Side1Speed - ((shutter1Side2Speed - shutter1Side1Speed) / 2)
+  const shutter1Sensor1Speed = shutter1Side1Speed + ((shutter1Side2Speed - shutter1Side1Speed) / 2)
   const shutter1Sensor2Speed = (shutter1Side1Speed + shutter1Side2Speed) / 2
-  const shutter1Sensor3Speed = shutter1Side2Speed + ((shutter1Side2Speed - shutter1Side1Speed) / 2)
+  const shutter1Sensor3Speed = shutter1Side2Speed - ((shutter1Side2Speed - shutter1Side1Speed) / 2)
 
-  const shutter2Sensor1Speed = shutter2Side1Speed - ((shutter2Side2Speed - shutter2Side1Speed) / 2)
+  const shutter2Sensor1Speed = shutter2Side1Speed + ((shutter2Side2Speed - shutter2Side1Speed) / 2)
   const shutter2Sensor2Speed = (shutter2Side1Speed + shutter2Side2Speed) / 2
-  const shutter2Sensor3Speed = shutter2Side2Speed + ((shutter2Side2Speed - shutter2Side1Speed) / 2)
+  const shutter2Sensor3Speed = shutter2Side2Speed - ((shutter2Side2Speed - shutter2Side1Speed) / 2)
 
   // Average both shutter speeds
   const averageSensor1Speed = (shutter1Sensor1Speed + shutter2Sensor1Speed)/2
@@ -29,9 +31,9 @@ export const compensateMeasurement = (measurement: ProcessedThreePointMeasuremen
   const sensor3SlitWidth = averageSensor3Speed * measurement.sensor3
 
   // Add in the sensor width compensation amount
-  const compensatedSensor1SlitWidth = sensor1SlitWidth + compensationWidth
-  const compensatedSensor2SlitWidth = sensor2SlitWidth + compensationWidth
-  const compensatedSensor3SlitWidth = sensor3SlitWidth + compensationWidth
+  const compensatedSensor1SlitWidth = sensor1SlitWidth - compensationWidth
+  const compensatedSensor2SlitWidth = sensor2SlitWidth - compensationWidth
+  const compensatedSensor3SlitWidth = sensor3SlitWidth - compensationWidth
 
   // Recalculate what the timings would have been at that speed with that width
   const compensatedSensor1Interval = Math.round(compensatedSensor1SlitWidth / averageSensor1Speed)

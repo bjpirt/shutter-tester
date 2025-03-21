@@ -1,7 +1,7 @@
 import { ProcessedThreePointMeasurement, ThreePointMeasurement } from "../types/Measurement";
 import compensateMeasurement from "./compensateMeasurement";
 
-const processThreePointMeasurement = (measurement: ThreePointMeasurement, compensate: boolean, width: number = 32): ProcessedThreePointMeasurement => {
+const processThreePointMeasurement = (measurement: ThreePointMeasurement, compensate: boolean = false, width: number = 32): ProcessedThreePointMeasurement => {
   const output =  {
     sensor1: measurement.sensor1.close - measurement.sensor1.open,
     sensor2: measurement.sensor2.close - measurement.sensor2.open,

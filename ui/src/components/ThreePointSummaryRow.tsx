@@ -1,10 +1,11 @@
 import { useContext } from "react";
+import averageThreePointMeasurements from "../lib/averageThreePointMeasurements";
 import {
   convertSpeedToFloat,
   displaySpeed,
   microsToMillis,
 } from "../lib/utils";
-import { SensorMeasurement, ThreePointMeasurement } from "../types/Message";
+import { ThreePointMeasurement } from "../types/Measurement";
 import Conditional from "./Conditional";
 import { Context } from "./SettingsContext";
 
@@ -16,59 +17,6 @@ type Props = {
   measurements?: ThreePointMeasurement[];
 };
 
-type ShutterTiming = { "1-2": number; "2-3": number };
-
-type MeasurementSummary = {
-  sensor1?: number;
-  sensor2?: number;
-  sensor3?: number;
-  shutter1Timing?: ShutterTiming;
-  shutter2Timing?: ShutterTiming;
-};
-
-const average = (input: number[]): number =>
-  input.reduce((sum, currentValue) => sum + currentValue, 0) / input.length;
-
-const averageSensorTimings = (
-  measurements: ThreePointMeasurement[],
-  sensor: keyof ThreePointMeasurement
-): number => {
-  const allIntervals = measurements.map(
-    (measurement) => measurement[sensor].close - measurement[sensor].open
-  );
-  return allIntervals.length > 0 ? average(allIntervals) : 0;
-};
-
-type ShutterType = keyof SensorMeasurement;
-
-const averageShutterTimings = (
-  measurements: ThreePointMeasurement[],
-  shutter: ShutterType
-): ShutterTiming => {
-  const timings1 = measurements.map((m) =>
-    Math.abs(m.sensor2[shutter] - m.sensor1[shutter])
-  );
-  const timings2 = measurements.map((m) =>
-    Math.abs(m.sensor3[shutter] - m.sensor2[shutter])
-  );
-  return { "1-2": average(timings1), "2-3": average(timings2) };
-};
-
-const summariseMeasurements = (
-  measurements?: ThreePointMeasurement[]
-): MeasurementSummary => {
-  if (!measurements) {
-    return {};
-  }
-  return {
-    sensor1: averageSensorTimings(measurements, "sensor1"),
-    sensor2: averageSensorTimings(measurements, "sensor2"),
-    sensor3: averageSensorTimings(measurements, "sensor3"),
-    shutter1Timing: averageShutterTimings(measurements, "open"),
-    shutter2Timing: averageShutterTimings(measurements, "close"),
-  };
-};
-
 export default function ThreePointSummaryRow({
   speed,
   selected,
@@ -76,9 +24,10 @@ export default function ThreePointSummaryRow({
   onRemove,
   measurements,
 }: Props) {
-  const summary = summariseMeasurements(measurements);
-  const speedUs = convertSpeedToFloat(speed) * 1000000;
   const { settings } = useContext(Context);
+  const averageMeasurements = averageThreePointMeasurements(measurements ?? [], settings.compensation)
+
+  const speedUs = convertSpeedToFloat(speed) * 1000000;
 
   return (
     <>
@@ -96,15 +45,15 @@ export default function ThreePointSummaryRow({
         <td>{speed} s</td>
         <td>{measurements?.length}</td>
         <Conditional display={settings.sensorData.display}>
-          <td>{displaySpeed(settings.sensorData, summary.sensor1, speedUs)}</td>
-          <td>{displaySpeed(settings.sensorData, summary.sensor2, speedUs)}</td>
-          <td>{displaySpeed(settings.sensorData, summary.sensor3, speedUs)}</td>
+          <td>{displaySpeed(settings.sensorData, averageMeasurements?.sensor1, speedUs)}</td>
+          <td>{displaySpeed(settings.sensorData, averageMeasurements?.sensor2, speedUs)}</td>
+          <td>{displaySpeed(settings.sensorData, averageMeasurements?.sensor3, speedUs)}</td>
         </Conditional>
         <Conditional display={settings.shutterData.display}>
-          <td>{microsToMillis(summary.shutter1Timing?.["1-2"], "ms")}</td>
-          <td>{microsToMillis(summary.shutter1Timing?.["2-3"], "ms")}</td>
-          <td>{microsToMillis(summary.shutter2Timing?.["1-2"], "ms")}</td>
-          <td>{microsToMillis(summary.shutter2Timing?.["2-3"], "ms")}</td>
+          <td>{microsToMillis(averageMeasurements?.shutter1.side1, "ms")}</td>
+          <td>{microsToMillis(averageMeasurements?.shutter1.side2, "ms")}</td>
+          <td>{microsToMillis(averageMeasurements?.shutter2.side1, "ms")}</td>
+          <td>{microsToMillis(averageMeasurements?.shutter2.side2, "ms")}</td>
         </Conditional>
         <td onClick={() => onRemove(speed)} className="remove">
           ❌

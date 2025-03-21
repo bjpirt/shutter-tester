@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import { ThreePointMeasurement } from "../types/Message";
+import { ThreePointMeasurement } from "../types/Measurement";
 import Conditional from "./Conditional";
 import { Context } from "./SettingsContext";
-import ThreePointSummaryRow from "./ThreePointSummaryRow";
 import ThreePointDetailRow from "./ThreePointDetailRow";
+import ThreePointSummaryRow from "./ThreePointSummaryRow";
 
 type Props = {
   speeds: string[];

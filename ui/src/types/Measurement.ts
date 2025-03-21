@@ -16,10 +16,12 @@ export const threePointMeasurementSchema = z.object({
 
 export type ThreePointMeasurement = z.infer<typeof threePointMeasurementSchema>;
 
+export type ShutterMeasurement = {side1: number, side2: number}
+
 export type ProcessedThreePointMeasurement = {
   sensor1: number
   sensor2: number
   sensor3: number
-  shutter1: {side1: number, side2: number}
-  shutter2: {side1: number, side2: number}
+  shutter1: ShutterMeasurement
+  shutter2: ShutterMeasurement
 }

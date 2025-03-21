@@ -14,11 +14,11 @@ import ThreePointMeasurements from "./components/ThreePointMeasurements";
 import { defaultSpeeds } from "./lib/defaults";
 import { useBluetooth } from "./lib/useBluetooth";
 import { formatSpeed, sortSpeeds } from "./lib/utils";
+import { ThreePointMeasurement } from "./types/Measurement";
 import Message, {
   MetadataMessage,
   Mode,
   SinglePointMessage,
-  ThreePointMeasurement,
   ThreePointMessage,
 } from "./types/Message";
 

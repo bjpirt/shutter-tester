@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { Context } from "./SettingsContext";
 import { Mode } from "../types/Message";
+import { Context } from "./SettingsContext";
 
 type Props = {
   onChange: (mode: Mode) => Promise<void>;

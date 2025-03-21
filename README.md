@@ -79,7 +79,9 @@ Looking at the exposure time at each sensor, you can see the timings would need 
 
 # To Do
 
-- [ ] Compensation for sensor width
+- [ ] Single shot mode (only show last shot timing) - useful for initial tuning
+- [ ] Separate shutter timing mode
+- [ ] Automatically work out vertical or horizontal shutter
 - [ ] Enable detailed measurements to be shown / hidden
 - [ ] Deploy to GitHub pages using GitHub actions
 - [ ] Display full shutter timing
@@ -87,6 +89,7 @@ Looking at the exposure time at each sensor, you can see the timings would need 
 - [ ] More display options for summarising the measurements
 - [ ] Calculate variations across shutter and whether they are within tolerances
 - [ ] Add graph visualisation of shutter speeds
+- [x] Compensation for sensor width
 
 ## Future
 
