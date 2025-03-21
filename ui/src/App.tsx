@@ -12,15 +12,19 @@ import SinglePointMeasurements from "./components/SinglePointMeasurements";
 import TestShot from "./components/TestShot";
 import ThreePointMeasurements from "./components/ThreePointMeasurements";
 import { defaultSpeeds } from "./lib/defaults";
+import messageHandler from "./lib/MessageHandler";
 import { useBluetooth } from "./lib/useBluetooth";
 import { formatSpeed, sortSpeeds } from "./lib/utils";
-import { ThreePointMeasurement } from "./types/Measurement";
+import {
+  SinglePointMeasurement,
+  ThreePointMeasurement,
+} from "./types/Measurement";
 import Message, {
   MetadataMessage,
   Mode,
   SinglePointMessage,
-  ThreePointMessage,
 } from "./types/Message";
+import { ViewMode } from "./types/ViewMode";
 
 const isDemo = (): boolean =>
   new URLSearchParams(window.location.search).get("demo") === "true";
@@ -60,16 +64,6 @@ function App() {
     measurement: number
   ) => {};
 
-  const removeThreePointMeasurement = (
-    speed: string,
-    measurement: ThreePointMeasurement
-  ) => {
-    setThreePointMeasurements({
-      ...threePointMeasurements,
-      [speed]: threePointMeasurements[speed].filter((m) => m != measurement),
-    });
-  };
-
   const handleMetadataMessage = (message: MetadataMessage) => {};
 
   const handleSinglePointMessage = ({ sensor2 }: SinglePointMessage) => {
@@ -79,34 +73,37 @@ function App() {
     }
     newMeasurements[selectedSpeed].push(sensor2);
     setSinglePointMeasurements(newMeasurements);
-    setSettings({ ...settings, mode: Mode.SINGLE_POINT });
+    setSettings({ ...settings, mode: ViewMode.SINGLE_POINT });
   };
 
-  const handleThreePointMessage = ({
-    type,
-    ...measurement
-  }: ThreePointMessage) => {
-    const newMeasurements = structuredClone(threePointMeasurements);
-    if (!Array.isArray(newMeasurements[selectedSpeed])) {
-      newMeasurements[selectedSpeed] = [];
-    }
-    newMeasurements[selectedSpeed].push(measurement);
-    setThreePointMeasurements(newMeasurements);
-    setSettings({ ...settings, mode: Mode.THREE_POINT });
-  };
-
-  const handleMessage = (message: Message) => {
-    console.log(message);
-    if (message.type === "metadata") {
-      handleMetadataMessage(message);
-    } else if (message.type === "single_point") {
-      handleSinglePointMessage(message);
+  const handleMessage = ({ type, ...measurement }: Message) => {
+    console.log({ type, ...measurement });
+    if (type === "metadata") {
+      handleMetadataMessage({ type, ...measurement } as MetadataMessage);
+    } else if (type === "single_point") {
+      messageHandler.emit(
+        "SinglePointMeasurement",
+        measurement as SinglePointMeasurement
+      );
+      // handleSinglePointMessage(message);
     } else {
-      handleThreePointMessage(message);
+      messageHandler.emit(
+        "ThreePointMeasurement",
+        measurement as ThreePointMeasurement
+      );
+      // handleThreePointMessage(message);
     }
   };
 
-  const { setMode, subscribe, isConnected } = useBluetooth(handleMessage);
+  const { setDeviceMode, subscribe, isConnected } = useBluetooth(handleMessage);
+
+  const setMode = (mode: ViewMode) => {
+    if ([ViewMode.THREE_POINT, ViewMode.SHUTTER_TIMING].includes(mode)) {
+      setDeviceMode(Mode.THREE_POINT);
+    } else if (mode === ViewMode.SINGLE_POINT) {
+      setDeviceMode(Mode.SINGLE_POINT);
+    }
+  };
 
   const subscribeBluetooth = () => {
     subscribe();
@@ -138,17 +135,10 @@ function App() {
         <CompensationControls />
         <button onClick={reset}>Reset data</button>
       </div>
-      <Conditional display={settings.mode === Mode.THREE_POINT}>
-        <ThreePointMeasurements
-          speeds={speeds}
-          onRemoveSpeed={removeSpeed}
-          selectedSpeed={selectedSpeed}
-          onSelectSpeed={selectSpeed}
-          measurements={threePointMeasurements}
-          onRemoveMeasurement={removeThreePointMeasurement}
-        />
+      <Conditional display={settings.mode === ViewMode.THREE_POINT}>
+        <ThreePointMeasurements onRemoveSpeed={removeSpeed} speeds={speeds} />
       </Conditional>
-      <Conditional display={settings.mode === Mode.SINGLE_POINT}>
+      <Conditional display={settings.mode === ViewMode.SINGLE_POINT}>
         <SinglePointMeasurements
           speeds={speeds}
           onRemoveSpeed={removeSpeed}

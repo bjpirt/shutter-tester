@@ -25,3 +25,7 @@ export type ProcessedThreePointMeasurement = {
   shutter1: ShutterMeasurement
   shutter2: ShutterMeasurement
 }
+
+export type SinglePointMeasurement = { sensor2: number}
+
+export type Measurement = ThreePointMeasurement | SinglePointMeasurement

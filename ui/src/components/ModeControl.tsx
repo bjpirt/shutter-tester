@@ -1,16 +1,16 @@
 import { useContext } from "react";
-import { Mode } from "../types/Message";
+import { ViewMode } from "../types/ViewMode";
 import { Context } from "./SettingsContext";
 
 type Props = {
-  onChange: (mode: Mode) => Promise<void>;
+  onChange: (mode: ViewMode) => void;
 };
 
 export default function ModeControl({ onChange }: Props) {
   const { settings, setSettings } = useContext(Context);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newMode = event.target.value as Mode;
+    const newMode = event.target.value as ViewMode;
     setSettings({ ...settings, mode: newMode });
     onChange(newMode);
   };
@@ -19,6 +19,7 @@ export default function ModeControl({ onChange }: Props) {
     <div className="control">
       <label htmlFor="mode">Mode: </label>
       <select name="mode" onChange={handleChange} value={settings.mode}>
+        <option value="shutter_timing">Shutter Timing</option>
         <option value="three_point">Three Point</option>
         <option value="single_point">Single Point</option>
       </select>
