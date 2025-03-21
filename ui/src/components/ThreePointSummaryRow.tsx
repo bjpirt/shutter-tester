@@ -4,9 +4,9 @@ import {
   displaySpeed,
   microsToMillis,
 } from "../lib/utils";
-import { SensorMeasurement, ThreePointMeasurement } from "../types/Message";
 import Conditional from "./Conditional";
 import { Context } from "./SettingsContext";
+import { SensorMeasurement, ThreePointMeasurement } from "../types/Measurement";
 
 type Props = {
   speed: string;
@@ -103,8 +103,22 @@ export default function ThreePointSummaryRow({
         <Conditional display={settings.shutterData.display}>
           <td>{microsToMillis(summary.shutter1Timing?.["1-2"], "ms")}</td>
           <td>{microsToMillis(summary.shutter1Timing?.["2-3"], "ms")}</td>
+          <td>
+            {microsToMillis(
+              (summary.shutter1Timing?.["1-2"] ?? 0) +
+                (summary.shutter1Timing?.["2-3"] ?? 0),
+              "ms"
+            )}
+          </td>
           <td>{microsToMillis(summary.shutter2Timing?.["1-2"], "ms")}</td>
           <td>{microsToMillis(summary.shutter2Timing?.["2-3"], "ms")}</td>
+          <td>
+            {microsToMillis(
+              (summary.shutter2Timing?.["1-2"] ?? 0) +
+                (summary.shutter2Timing?.["2-3"] ?? 0),
+              "ms"
+            )}
+          </td>
         </Conditional>
         <td onClick={() => onRemove(speed)} className="remove">
           ❌

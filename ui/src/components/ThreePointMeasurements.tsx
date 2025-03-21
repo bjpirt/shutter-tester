@@ -1,9 +1,9 @@
 import { useContext } from "react";
-import { ThreePointMeasurement } from "../types/Message";
 import Conditional from "./Conditional";
 import { Context } from "./SettingsContext";
 import ThreePointSummaryRow from "./ThreePointSummaryRow";
 import ThreePointDetailRow from "./ThreePointDetailRow";
+import { ThreePointMeasurement } from "../types/Measurement";
 
 type Props = {
   speeds: string[];
@@ -42,8 +42,10 @@ export default function ThreePointMeasurements({
           <Conditional display={settings.shutterData.display}>
             <th>Shutter 1 (1 - 2)</th>
             <th>Shutter 1 (2 - 3)</th>
+            <th>Shutter 1 (1 - 3)</th>
             <th>Shutter 2 (1 - 2)</th>
             <th>Shutter 2 (2 - 3)</th>
+            <th>Shutter 2 (1 - 3)</th>
           </Conditional>
           <th></th>
         </tr>

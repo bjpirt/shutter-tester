@@ -24,14 +24,17 @@ export default function ThreePointDetailRow({
 
   const speedUs = convertSpeedToFloat(selectedSpeed) * 1000000;
 
-  const processedMeasurement = processThreePointMeasurement(measurement, settings.compensation);
+  const processedMeasurement = processThreePointMeasurement(
+    measurement,
+    settings.compensation
+  );
 
   return (
     <tr className="measurement-detail">
+      <td></td>
+      <td></td>
+      <td></td>
       <Conditional display={settings.sensorData.display}>
-        <td></td>
-        <td></td>
-        <td></td>
         <td>
           {displaySpeed(
             settings.sensorData,
@@ -57,8 +60,20 @@ export default function ThreePointDetailRow({
       <Conditional display={settings.shutterData.display}>
         <td>{displayInterval(processedMeasurement.shutter1.side1)}</td>
         <td>{displayInterval(processedMeasurement.shutter1.side2)}</td>
+        <td>
+          {displayInterval(
+            processedMeasurement.shutter1.side1 +
+              processedMeasurement.shutter1.side2
+          )}
+        </td>
         <td>{displayInterval(processedMeasurement.shutter2.side1)}</td>
         <td>{displayInterval(processedMeasurement.shutter2.side2)}</td>
+        <td>
+          {displayInterval(
+            processedMeasurement.shutter2.side1 +
+              processedMeasurement.shutter2.side2
+          )}
+        </td>
       </Conditional>
       <td
         onClick={() => onRemove(selectedSpeed, measurement)}
