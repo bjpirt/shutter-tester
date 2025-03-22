@@ -1,6 +1,5 @@
 import * as React from "react";
-import { messageSchema, Mode } from "../types/Message";
-import Message from "../types/Message";
+import Message, { messageSchema, Mode } from "../types/Message";
 
 var deviceName = "ShutterTester";
 var bleServiceId = "42de79f1-7248-4c9b-9279-96509b8a9f5c";
@@ -10,7 +9,7 @@ var modeCharacteristicId = "42de79f1-7248-4c9b-9279-96509b8a9f5e";
 export interface Bluetooth {
   isConnected: boolean;
   subscribe: () => void;
-  setMode: (mode: Mode) => Promise<void>;
+  setDeviceMode: (mode: Mode) => Promise<void>;
 }
 
 export const useBluetooth = (eventHandler: (x: Message) => void): Bluetooth => {
@@ -74,12 +73,12 @@ export const useBluetooth = (eventHandler: (x: Message) => void): Bluetooth => {
     }
   };
 
-  const setMode = async (mode: Mode) => {
+  const setDeviceMode = async (mode: Mode) => {
     const modeValue = [null, Mode.SINGLE_POINT, Mode.THREE_POINT].indexOf(mode);
     if (modeCharacteristic) {
       await modeCharacteristic.writeValue(Uint8Array.of(modeValue));
     }
   };
 
-  return { setMode, subscribe, isConnected };
+  return { setDeviceMode, subscribe, isConnected };
 };

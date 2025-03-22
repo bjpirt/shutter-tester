@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { Mode } from "../types/Message";
+import { ViewMode } from "../types/ViewMode";
 
 export type SensorSettings = {
   milliseconds: boolean;
@@ -9,7 +9,7 @@ export type SensorSettings = {
 
 export type Settings = {
   compensation: boolean
-  mode: Mode;
+  mode: ViewMode;
   sensorData: SensorSettings & {
     display: boolean;
   };
@@ -20,7 +20,7 @@ export type Settings = {
 
 const defaultSettings: Settings = {
   compensation: true,
-  mode: Mode.THREE_POINT,
+  mode: ViewMode.THREE_POINT,
   sensorData: {
     display: true,
     milliseconds: false,
@@ -28,7 +28,7 @@ const defaultSettings: Settings = {
     exposure: true,
   },
   shutterData: {
-    display: true,
+    display: false,
   },
 };
 

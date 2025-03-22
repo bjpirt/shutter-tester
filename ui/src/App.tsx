@@ -1,42 +1,33 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./App.css";
 import AddSpeed from "./components/AddSpeed";
-import CompensationControls from "./components/CompensationControls";
 import Conditional from "./components/Conditional";
 import Connect from "./components/Connect";
 import ModeControl from "./components/ModeControl";
-import SensorControls from "./components/SensorControls";
 import { Context } from "./components/SettingsContext";
-import ShutterControls from "./components/ShutterControls";
+import ShutterTimingView from "./components/ShutterTimingView";
 import SinglePointMeasurements from "./components/SinglePointMeasurements";
 import TestShot from "./components/TestShot";
 import ThreePointMeasurements from "./components/ThreePointMeasurements";
 import { defaultSpeeds } from "./lib/defaults";
+import messageHandler from "./lib/internalMessageBus";
 import { useBluetooth } from "./lib/useBluetooth";
 import { formatSpeed, sortSpeeds } from "./lib/utils";
-import { ThreePointMeasurement } from "./types/Measurement";
-import Message, {
-  MetadataMessage,
-  Mode,
-  SinglePointMessage,
-  ThreePointMessage,
-} from "./types/Message";
+import { InternalMessage, InternalMessageType } from "./types/InternalMessage";
+import {
+  SinglePointMeasurement,
+  ThreePointMeasurement,
+} from "./types/Measurement";
+import Message, { MetadataMessage, Mode } from "./types/Message";
+import { ViewMode } from "./types/ViewMode";
 
 const isDemo = (): boolean =>
   new URLSearchParams(window.location.search).get("demo") === "true";
 
 function App() {
-  const { settings, setSettings } = useContext(Context);
+  const { settings } = useContext(Context);
   const [speeds, setSpeeds] = useState(defaultSpeeds);
-  const [selectedSpeed, setSelectedSpeed] = useState<string>(speeds[0]);
-
-  const [threePointMeasurements, setThreePointMeasurements] = useState<
-    Record<string, ThreePointMeasurement[]>
-  >({});
-
-  const [singlePointMeasurements, setSinglePointMeasurements] = useState<
-    Record<string, number[]>
-  >({});
+  const [selectedSpeed, setSelectedSpeed] = useState(speeds[0]);
 
   const removeSpeed = (speed: string) => {
     setSpeeds(speeds.filter((existingSpeed) => existingSpeed !== speed));
@@ -47,75 +38,66 @@ function App() {
   };
 
   const reset = () => {
-    setThreePointMeasurements({});
-    setSinglePointMeasurements({});
-  };
-
-  const selectSpeed = (speed: string) => {
-    setSelectedSpeed(speed);
-  };
-
-  const removeSinglePointMeasurement = (
-    speed: string,
-    measurement: number
-  ) => {};
-
-  const removeThreePointMeasurement = (
-    speed: string,
-    measurement: ThreePointMeasurement
-  ) => {
-    setThreePointMeasurements({
-      ...threePointMeasurements,
-      [speed]: threePointMeasurements[speed].filter((m) => m != measurement),
-    });
+    messageHandler.emit({ type: InternalMessageType.Reset });
   };
 
   const handleMetadataMessage = (message: MetadataMessage) => {};
 
-  const handleSinglePointMessage = ({ sensor2 }: SinglePointMessage) => {
-    const newMeasurements = structuredClone(singlePointMeasurements);
-    if (!Array.isArray(newMeasurements[selectedSpeed])) {
-      newMeasurements[selectedSpeed] = [];
-    }
-    newMeasurements[selectedSpeed].push(sensor2);
-    setSinglePointMeasurements(newMeasurements);
-    setSettings({ ...settings, mode: Mode.SINGLE_POINT });
-  };
-
-  const handleThreePointMessage = ({
-    type,
-    ...measurement
-  }: ThreePointMessage) => {
-    const newMeasurements = structuredClone(threePointMeasurements);
-    if (!Array.isArray(newMeasurements[selectedSpeed])) {
-      newMeasurements[selectedSpeed] = [];
-    }
-    newMeasurements[selectedSpeed].push(measurement);
-    setThreePointMeasurements(newMeasurements);
-    setSettings({ ...settings, mode: Mode.THREE_POINT });
-  };
-
-  const handleMessage = (message: Message) => {
-    console.log(message);
-    if (message.type === "metadata") {
-      handleMetadataMessage(message);
-    } else if (message.type === "single_point") {
-      handleSinglePointMessage(message);
+  const handleMessage = ({ type, ...measurement }: Message) => {
+    console.log({ type, ...measurement });
+    if (type === "metadata") {
+      handleMetadataMessage({ type, ...measurement } as MetadataMessage);
+    } else if (type === "single_point") {
+      messageHandler.emit({
+        type: InternalMessageType.SinglePointMeasurement,
+        data: measurement as SinglePointMeasurement,
+      });
     } else {
-      handleThreePointMessage(message);
+      messageHandler.emit({
+        type: InternalMessageType.ThreePointMeasurement,
+        data: measurement as ThreePointMeasurement,
+      });
     }
   };
 
-  const { setMode, subscribe, isConnected } = useBluetooth(handleMessage);
+  const { setDeviceMode, subscribe, isConnected } = useBluetooth(handleMessage);
+
+  const setMode = (mode: ViewMode) => {
+    if ([ViewMode.THREE_POINT, ViewMode.SHUTTER_TIMING].includes(mode)) {
+      setDeviceMode(Mode.THREE_POINT);
+    } else if (mode === ViewMode.SINGLE_POINT) {
+      setDeviceMode(Mode.SINGLE_POINT);
+    }
+  };
 
   const subscribeBluetooth = () => {
     subscribe();
   };
 
+  useEffect(() => {
+    const handleSelectSpeed = (message: InternalMessage) => {
+      if(message.type !== InternalMessageType.SelectSpeed){
+        return
+      }
+      setSelectedSpeed(message.data);
+    }
+
+    messageHandler.on(InternalMessageType.SelectSpeed, handleSelectSpeed);
+
+    return () => {
+      messageHandler.off(InternalMessageType.SelectSpeed, handleSelectSpeed);
+    };
+  }, []);
+
   return (
     <>
       <header>
         <div className="connect">
+          <ModeControl onChange={setMode} />
+          <AddSpeed onAddSpeed={addSpeed} />
+          <div className="control">
+          <button onClick={reset}>Reset data</button>
+          </div>
           {isDemo() ? (
             <TestShot
               onClick={handleMessage}
@@ -130,33 +112,14 @@ function App() {
           <span className="icon">📷</span> Shutter Tester
         </h1>
       </header>
-      <div id="controls">
-        <ModeControl onChange={setMode} />
-        <AddSpeed onAddSpeed={addSpeed} />
-        <SensorControls />
-        <ShutterControls />
-        <CompensationControls />
-        <button onClick={reset}>Reset data</button>
-      </div>
-      <Conditional display={settings.mode === Mode.THREE_POINT}>
-        <ThreePointMeasurements
-          speeds={speeds}
-          onRemoveSpeed={removeSpeed}
-          selectedSpeed={selectedSpeed}
-          onSelectSpeed={selectSpeed}
-          measurements={threePointMeasurements}
-          onRemoveMeasurement={removeThreePointMeasurement}
-        />
+      <Conditional display={settings.mode === ViewMode.THREE_POINT}>
+        <ThreePointMeasurements onRemoveSpeed={removeSpeed} speeds={speeds} />
       </Conditional>
-      <Conditional display={settings.mode === Mode.SINGLE_POINT}>
-        <SinglePointMeasurements
-          speeds={speeds}
-          onRemoveSpeed={removeSpeed}
-          selectedSpeed={selectedSpeed}
-          onSelectSpeed={selectSpeed}
-          measurements={singlePointMeasurements}
-          onRemoveMeasurement={removeSinglePointMeasurement}
-        />
+      <Conditional display={settings.mode === ViewMode.SINGLE_POINT}>
+        <SinglePointMeasurements onRemoveSpeed={removeSpeed} speeds={speeds} />
+      </Conditional>
+      <Conditional display={settings.mode === ViewMode.SHUTTER_TIMING}>
+        <ShutterTimingView />
       </Conditional>
     </>
   );

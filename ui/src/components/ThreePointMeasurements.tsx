@@ -1,82 +1,146 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
+import messageHandler from "../lib/internalMessageBus";
+import { InternalMessage, InternalMessageType } from "../types/InternalMessage";
 import { ThreePointMeasurement } from "../types/Measurement";
+import CompensationControls from "./CompensationControls";
 import Conditional from "./Conditional";
+import SensorControls from "./SensorControls";
 import { Context } from "./SettingsContext";
+import ShutterControls from "./ShutterControls";
 import ThreePointDetailRow from "./ThreePointDetailRow";
 import ThreePointSummaryRow from "./ThreePointSummaryRow";
 
 type Props = {
   speeds: string[];
-  selectedSpeed: null | string;
   onRemoveSpeed: (speed: string) => void;
-  onSelectSpeed: (speed: string) => void;
-  measurements: Record<string, ThreePointMeasurement[]>;
-  onRemoveMeasurement: (
-    speed: string,
-    measurement: ThreePointMeasurement
-  ) => void;
 };
 
 export default function ThreePointMeasurements({
   speeds,
   onRemoveSpeed,
-  selectedSpeed,
-  onRemoveMeasurement,
-  onSelectSpeed,
-  measurements,
 }: Props) {
+  const [selectedSpeed, setSelectedSpeed] = useState<string>(speeds[0]);
   const { settings } = useContext(Context);
 
+  const [measurements, setMeasurements] = useState<
+    Record<string, ThreePointMeasurement[]>
+  >({});
+
+  const selectSpeed = (speed: string) => {
+    messageHandler.emit({ type: InternalMessageType.SelectSpeed, data: speed });
+    setSelectedSpeed(speed);
+  };
+
+  const removeMeasurement = (
+    speed: string,
+    measurement: ThreePointMeasurement
+  ) => {
+    setMeasurements({
+      ...measurements,
+      [speed]: measurements[speed].filter((m) => m != measurement),
+    });
+  };
+
+  const addMeasurement = (measurement: ThreePointMeasurement) => {
+    setMeasurements({
+      ...measurements,
+      [selectedSpeed]: [
+        measurement,
+        ...(measurements[selectedSpeed] ?? []),
+      ],
+    });
+  };
+
+  useEffect(() => {
+    const handleNewMeasurement = (message: InternalMessage) => {
+      if (
+        selectedSpeed === null ||
+        message.type !== InternalMessageType.ThreePointMeasurement
+      ) {
+        return;
+      }
+      addMeasurement(message.data);
+    };
+
+    const handleReset = (message: InternalMessage) => {
+      if (message.type !== InternalMessageType.Reset) {
+        return;
+      }
+      setMeasurements({});
+    };
+
+    messageHandler.on(
+      InternalMessageType.ThreePointMeasurement,
+      handleNewMeasurement
+    );
+    messageHandler.on(InternalMessageType.Reset, handleReset);
+
+    return () => {
+      messageHandler.off(
+        InternalMessageType.ThreePointMeasurement,
+        handleNewMeasurement
+      );
+      messageHandler.off(InternalMessageType.Reset, handleReset);
+    };
+  }, [selectedSpeed, measurements]);
+
   return (
-    <table className="summary">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Speed</th>
-          <th>Measurements</th>
-          <Conditional display={settings.sensorData.display}>
-            <th>Sensor 1</th>
-            <th>Sensor 2</th>
-            <th>Sensor 3</th>
-          </Conditional>
-          <Conditional display={settings.shutterData.display}>
-            <th>Shutter 1 (1 - 2)</th>
-            <th>Shutter 1 (2 - 3)</th>
-            <th>Shutter 2 (1 - 2)</th>
-            <th>Shutter 2 (2 - 3)</th>
-          </Conditional>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        {speeds.map((speed) => {
-          const selected = speed === selectedSpeed;
-          const selectedMeasurements = measurements[speed ?? ""];
+    <>
+      <div id="controls">
+        <SensorControls />
+        <ShutterControls />
+        <CompensationControls />
+      </div>
+      <table className="summary">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Speed</th>
+            <th>Measurements</th>
+            <Conditional display={settings.sensorData.display}>
+              <th>Sensor 1</th>
+              <th>Sensor 2</th>
+              <th>Sensor 3</th>
+            </Conditional>
+            <Conditional display={settings.shutterData.display}>
+              <th>Shutter 1 (1 - 2)</th>
+              <th>Shutter 1 (2 - 3)</th>
+              <th>Shutter 2 (1 - 2)</th>
+              <th>Shutter 2 (2 - 3)</th>
+            </Conditional>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {speeds.map((speed) => {
+            const selected = speed === selectedSpeed;
+            const selectedMeasurements = measurements[speed ?? ""];
 
-          return (
-            <>
-              <ThreePointSummaryRow
-                key={speed}
-                speed={speed}
-                selected={selected}
-                onSelect={onSelectSpeed}
-                onRemove={onRemoveSpeed}
-                measurements={selectedMeasurements}
-              />
+            return (
+              <>
+                <ThreePointSummaryRow
+                  key={speed}
+                  speed={speed}
+                  selected={selected}
+                  onSelect={selectSpeed}
+                  onRemove={onRemoveSpeed}
+                  measurements={selectedMeasurements}
+                />
 
-              {selected
-                ? selectedMeasurements?.map((m) => (
-                    <ThreePointDetailRow
-                      measurement={m}
-                      selectedSpeed={speed}
-                      onRemove={() => onRemoveMeasurement(speed, m)}
-                    />
-                  ))
-                : undefined}
-            </>
-          );
-        })}
-      </tbody>
-    </table>
+                {selected
+                  ? selectedMeasurements?.map((m) => (
+                      <ThreePointDetailRow
+                        measurement={m}
+                        selectedSpeed={speed}
+                        onRemove={() => removeMeasurement(speed, m)}
+                      />
+                    ))
+                  : undefined}
+              </>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 }

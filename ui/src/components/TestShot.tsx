@@ -1,14 +1,14 @@
 import { convertSpeedToFloat } from "../lib/utils";
 import Message, {
-  Mode,
   SinglePointMessage,
-  ThreePointMessage,
+  ThreePointMessage
 } from "../types/Message";
+import { ViewMode } from "../types/ViewMode";
 
 type Props = {
   onClick: (message: Message) => void;
   selectedSpeed: string;
-  mode: Mode;
+  mode: ViewMode;
 };
 
 const randomInt = (range: number): number => Math.floor(Math.random() * range);
@@ -40,10 +40,12 @@ const generateSinglePointTestData = (speed: string): SinglePointMessage => {
 export default function TestShot({ onClick, selectedSpeed, mode }: Props) {
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    if (mode === Mode.THREE_POINT) {
+    if (mode === ViewMode.THREE_POINT) {
       onClick(generateThreePointTestData(selectedSpeed));
-    } else if (mode === Mode.SINGLE_POINT) {
+    } else if (mode === ViewMode.SINGLE_POINT) {
       onClick(generateSinglePointTestData(selectedSpeed));
+    } else if (mode === ViewMode.SHUTTER_TIMING) {
+      onClick(generateThreePointTestData("1/250"));
     }
   };
 
