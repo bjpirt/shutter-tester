@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import messageHandler from "../lib/MessageHandler";
+import messageHandler from "../lib/internalMessageBus";
+import { InternalMessage, InternalMessageType } from "../types/InternalMessage";
 import {
-  Measurement,
-  ThreePointMeasurement,
-  threePointMeasurementSchema,
+  ThreePointMeasurement
 } from "../types/Measurement";
 import { ViewMode } from "../types/ViewMode";
 import Conditional from "./Conditional";
@@ -28,6 +27,7 @@ export default function ThreePointMeasurements({
   >({});
 
   const selectSpeed = (speed: string) => {
+    messageHandler.emit({type: InternalMessageType.SelectSpeed, data: speed})
     setSelectedSpeed(speed);
   };
 
@@ -42,7 +42,6 @@ export default function ThreePointMeasurements({
   };
 
   const addMeasurement = (measurement: ThreePointMeasurement) => {
-    console.log(selectedSpeed)
     const newMeasurements = structuredClone(measurements);
     if (!Array.isArray(newMeasurements[selectedSpeed])) {
       newMeasurements[selectedSpeed] = [];
@@ -53,19 +52,26 @@ export default function ThreePointMeasurements({
   };
 
   useEffect(() => {
-    const handleNewMeasurement = (measurement: Measurement) => {
-      const parsedMeasurement =
-        threePointMeasurementSchema.safeParse(measurement);
-      if (selectedSpeed === null || parsedMeasurement.error) {
-        return;
+    const handleNewMeasurement = (message: InternalMessage) => {
+      if(selectedSpeed === null || message.type !== InternalMessageType.ThreePointMeasurement){
+        return
       }
-      addMeasurement(parsedMeasurement.data);
+      addMeasurement(message.data);
     };
 
-    messageHandler.on("ThreePointMeasurement", handleNewMeasurement);
+    const handleReset = (message: InternalMessage) => {
+      if(message.type !== InternalMessageType.Reset){
+        return
+      }
+      setMeasurements({});
+    }
+
+    messageHandler.on(InternalMessageType.ThreePointMeasurement, handleNewMeasurement);
+    messageHandler.on(InternalMessageType.Reset, handleReset);
 
     return () => {
-      messageHandler.off("ThreePointMeasurement", handleNewMeasurement);
+      messageHandler.off(InternalMessageType.ThreePointMeasurement, handleNewMeasurement);
+      messageHandler.off(InternalMessageType.Reset, handleReset);
     };
   }, [selectedSpeed, measurements]);
 

@@ -26,6 +26,10 @@ export type ProcessedThreePointMeasurement = {
   shutter2: ShutterMeasurement
 }
 
-export type SinglePointMeasurement = { sensor2: number}
+export const singlePointMeasurementSchema = z.object({
+  sensor2: z.number()
+});
+
+export type SinglePointMeasurement = z.infer<typeof singlePointMeasurementSchema>;
 
 export type Measurement = ThreePointMeasurement | SinglePointMeasurement

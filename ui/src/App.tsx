@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./App.css";
 import AddSpeed from "./components/AddSpeed";
 import CompensationControls from "./components/CompensationControls";
@@ -12,35 +12,24 @@ import SinglePointMeasurements from "./components/SinglePointMeasurements";
 import TestShot from "./components/TestShot";
 import ThreePointMeasurements from "./components/ThreePointMeasurements";
 import { defaultSpeeds } from "./lib/defaults";
-import messageHandler from "./lib/MessageHandler";
+import messageHandler from "./lib/internalMessageBus";
 import { useBluetooth } from "./lib/useBluetooth";
 import { formatSpeed, sortSpeeds } from "./lib/utils";
+import { InternalMessage, InternalMessageType } from "./types/InternalMessage";
 import {
   SinglePointMeasurement,
   ThreePointMeasurement,
 } from "./types/Measurement";
-import Message, {
-  MetadataMessage,
-  Mode,
-  SinglePointMessage,
-} from "./types/Message";
+import Message, { MetadataMessage, Mode } from "./types/Message";
 import { ViewMode } from "./types/ViewMode";
 
 const isDemo = (): boolean =>
   new URLSearchParams(window.location.search).get("demo") === "true";
 
 function App() {
-  const { settings, setSettings } = useContext(Context);
+  const { settings } = useContext(Context);
   const [speeds, setSpeeds] = useState(defaultSpeeds);
-  const [selectedSpeed, setSelectedSpeed] = useState<string>(speeds[0]);
-
-  const [threePointMeasurements, setThreePointMeasurements] = useState<
-    Record<string, ThreePointMeasurement[]>
-  >({});
-
-  const [singlePointMeasurements, setSinglePointMeasurements] = useState<
-    Record<string, number[]>
-  >({});
+  const [selectedSpeed, setSelectedSpeed] = useState(speeds[0]);
 
   const removeSpeed = (speed: string) => {
     setSpeeds(speeds.filter((existingSpeed) => existingSpeed !== speed));
@@ -51,47 +40,25 @@ function App() {
   };
 
   const reset = () => {
-    setThreePointMeasurements({});
-    setSinglePointMeasurements({});
+    messageHandler.emit({ type: InternalMessageType.Reset });
   };
-
-  const selectSpeed = (speed: string) => {
-    setSelectedSpeed(speed);
-  };
-
-  const removeSinglePointMeasurement = (
-    speed: string,
-    measurement: number
-  ) => {};
 
   const handleMetadataMessage = (message: MetadataMessage) => {};
-
-  const handleSinglePointMessage = ({ sensor2 }: SinglePointMessage) => {
-    const newMeasurements = structuredClone(singlePointMeasurements);
-    if (!Array.isArray(newMeasurements[selectedSpeed])) {
-      newMeasurements[selectedSpeed] = [];
-    }
-    newMeasurements[selectedSpeed].push(sensor2);
-    setSinglePointMeasurements(newMeasurements);
-    setSettings({ ...settings, mode: ViewMode.SINGLE_POINT });
-  };
 
   const handleMessage = ({ type, ...measurement }: Message) => {
     console.log({ type, ...measurement });
     if (type === "metadata") {
       handleMetadataMessage({ type, ...measurement } as MetadataMessage);
     } else if (type === "single_point") {
-      messageHandler.emit(
-        "SinglePointMeasurement",
-        measurement as SinglePointMeasurement
-      );
-      // handleSinglePointMessage(message);
+      messageHandler.emit({
+        type: InternalMessageType.SinglePointMeasurement,
+        data: measurement as SinglePointMeasurement,
+      });
     } else {
-      messageHandler.emit(
-        "ThreePointMeasurement",
-        measurement as ThreePointMeasurement
-      );
-      // handleThreePointMessage(message);
+      messageHandler.emit({
+        type: InternalMessageType.ThreePointMeasurement,
+        data: measurement as ThreePointMeasurement,
+      });
     }
   };
 
@@ -108,6 +75,21 @@ function App() {
   const subscribeBluetooth = () => {
     subscribe();
   };
+
+  useEffect(() => {
+    const handleSelectSpeed = (message: InternalMessage) => {
+      if(message.type !== InternalMessageType.SelectSpeed){
+        return
+      }
+      setSelectedSpeed(message.data);
+    }
+
+    messageHandler.on(InternalMessageType.SelectSpeed, handleSelectSpeed);
+
+    return () => {
+      messageHandler.off(InternalMessageType.SelectSpeed, handleSelectSpeed);
+    };
+  }, []);
 
   return (
     <>
@@ -139,14 +121,7 @@ function App() {
         <ThreePointMeasurements onRemoveSpeed={removeSpeed} speeds={speeds} />
       </Conditional>
       <Conditional display={settings.mode === ViewMode.SINGLE_POINT}>
-        <SinglePointMeasurements
-          speeds={speeds}
-          onRemoveSpeed={removeSpeed}
-          selectedSpeed={selectedSpeed}
-          onSelectSpeed={selectSpeed}
-          measurements={singlePointMeasurements}
-          onRemoveMeasurement={removeSinglePointMeasurement}
-        />
+        <SinglePointMeasurements onRemoveSpeed={removeSpeed} speeds={speeds} />
       </Conditional>
     </>
   );
