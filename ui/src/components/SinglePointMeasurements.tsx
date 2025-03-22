@@ -1,9 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import messageHandler from "../lib/internalMessageBus";
 import { InternalMessage, InternalMessageType } from "../types/InternalMessage";
 import { SinglePointMeasurement } from "../types/Measurement";
-import { ViewMode } from "../types/ViewMode";
-import { Context } from "./SettingsContext";
 import SinglePointDetailRow from "./SinglePointDetailRow";
 import SinglePointSummaryRow from "./SinglePointSummaryRow";
 
@@ -15,22 +13,19 @@ type Props = {
 export default function SinglePointMeasurements({
   speeds,
   onRemoveSpeed,
-}: Props) {const [selectedSpeed, setSelectedSpeed] = useState<string>(speeds[0]);
-  const { settings, setSettings } = useContext(Context);
+}: Props) {
+  const [selectedSpeed, setSelectedSpeed] = useState<string>(speeds[0]);
 
-  const [measurements, setMeasurements] = useState<
-    Record<string, number[]>
-  >({});
+  const [measurements, setMeasurements] = useState<Record<string, number[]>>(
+    {}
+  );
 
   const selectSpeed = (speed: string) => {
-    messageHandler.emit({type: InternalMessageType.SelectSpeed, data: speed})
+    messageHandler.emit({ type: InternalMessageType.SelectSpeed, data: speed });
     setSelectedSpeed(speed);
   };
 
-  const removeMeasurement = (
-    speed: string,
-    index: number
-  ) => {
+  const removeMeasurement = (speed: string, index: number) => {
     setMeasurements({
       ...measurements,
       [speed]: measurements[speed].filter((_, i) => i !== index),
@@ -38,35 +33,44 @@ export default function SinglePointMeasurements({
   };
 
   const addMeasurement = (measurement: SinglePointMeasurement) => {
-    const newMeasurements = structuredClone(measurements);
-    if (!Array.isArray(newMeasurements[selectedSpeed])) {
-      newMeasurements[selectedSpeed] = [];
-    }
-    newMeasurements[selectedSpeed].push(measurement.sensor2);
-    setMeasurements(newMeasurements);
-    setSettings({ ...settings, mode: ViewMode.SINGLE_POINT });
+    setMeasurements({
+      ...measurements,
+      [selectedSpeed]: [
+        measurement.sensor2,
+        ...(measurements[selectedSpeed] ?? []),
+      ],
+    });
   };
 
   useEffect(() => {
     const handleNewMeasurement = (message: InternalMessage) => {
-      if (selectedSpeed === null || message.type !== InternalMessageType.SinglePointMeasurement) {
+      if (
+        selectedSpeed === null ||
+        message.type !== InternalMessageType.SinglePointMeasurement
+      ) {
         return;
       }
       addMeasurement(message.data);
     };
 
     const handleReset = (message: InternalMessage) => {
-      if(message.type !== InternalMessageType.Reset){
-        return
+      if (message.type !== InternalMessageType.Reset) {
+        return;
       }
       setMeasurements({});
-    }
+    };
 
-    messageHandler.on(InternalMessageType.SinglePointMeasurement, handleNewMeasurement);
+    messageHandler.on(
+      InternalMessageType.SinglePointMeasurement,
+      handleNewMeasurement
+    );
     messageHandler.on(InternalMessageType.Reset, handleReset);
 
     return () => {
-      messageHandler.off(InternalMessageType.SinglePointMeasurement, handleNewMeasurement);
+      messageHandler.off(
+        InternalMessageType.SinglePointMeasurement,
+        handleNewMeasurement
+      );
       messageHandler.off(InternalMessageType.Reset, handleReset);
     };
   }, [selectedSpeed, measurements]);

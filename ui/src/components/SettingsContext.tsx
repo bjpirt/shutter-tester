@@ -28,7 +28,7 @@ const defaultSettings: Settings = {
     exposure: true,
   },
   shutterData: {
-    display: true,
+    display: false,
   },
 };
 

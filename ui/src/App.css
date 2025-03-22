@@ -19,7 +19,7 @@ table tr:nth-child(odd) {
   background-color: #2b2b2b
 }
 
-#controls .control{
+.control{
   display: inline-block;
   padding: 4px;
 }

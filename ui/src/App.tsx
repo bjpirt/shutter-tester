@@ -1,13 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import "./App.css";
 import AddSpeed from "./components/AddSpeed";
-import CompensationControls from "./components/CompensationControls";
 import Conditional from "./components/Conditional";
 import Connect from "./components/Connect";
 import ModeControl from "./components/ModeControl";
-import SensorControls from "./components/SensorControls";
 import { Context } from "./components/SettingsContext";
-import ShutterControls from "./components/ShutterControls";
+import ShutterTimingView from "./components/ShutterTimingView";
 import SinglePointMeasurements from "./components/SinglePointMeasurements";
 import TestShot from "./components/TestShot";
 import ThreePointMeasurements from "./components/ThreePointMeasurements";
@@ -95,6 +93,11 @@ function App() {
     <>
       <header>
         <div className="connect">
+          <ModeControl onChange={setMode} />
+          <AddSpeed onAddSpeed={addSpeed} />
+          <div className="control">
+          <button onClick={reset}>Reset data</button>
+          </div>
           {isDemo() ? (
             <TestShot
               onClick={handleMessage}
@@ -109,19 +112,14 @@ function App() {
           <span className="icon">📷</span> Shutter Tester
         </h1>
       </header>
-      <div id="controls">
-        <ModeControl onChange={setMode} />
-        <AddSpeed onAddSpeed={addSpeed} />
-        <SensorControls />
-        <ShutterControls />
-        <CompensationControls />
-        <button onClick={reset}>Reset data</button>
-      </div>
       <Conditional display={settings.mode === ViewMode.THREE_POINT}>
         <ThreePointMeasurements onRemoveSpeed={removeSpeed} speeds={speeds} />
       </Conditional>
       <Conditional display={settings.mode === ViewMode.SINGLE_POINT}>
         <SinglePointMeasurements onRemoveSpeed={removeSpeed} speeds={speeds} />
+      </Conditional>
+      <Conditional display={settings.mode === ViewMode.SHUTTER_TIMING}>
+        <ShutterTimingView />
       </Conditional>
     </>
   );

@@ -44,6 +44,8 @@ export default function TestShot({ onClick, selectedSpeed, mode }: Props) {
       onClick(generateThreePointTestData(selectedSpeed));
     } else if (mode === ViewMode.SINGLE_POINT) {
       onClick(generateSinglePointTestData(selectedSpeed));
+    } else if (mode === ViewMode.SHUTTER_TIMING) {
+      onClick(generateThreePointTestData("1/250"));
     }
   };
 
