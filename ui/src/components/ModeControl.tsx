@@ -19,6 +19,7 @@ export default function ModeControl({ onChange }: Props) {
     <div className="control">
       <label htmlFor="mode">Mode: </label>
       <select name="mode" onChange={handleChange} value={settings.mode}>
+        <option value="shot_by_shot">Shot by Shot</option>
         <option value="shutter_timing">Shutter Timing</option>
         <option value="three_point">Three Point</option>
         <option value="single_point">Single Point</option>

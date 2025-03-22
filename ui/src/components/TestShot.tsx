@@ -1,7 +1,7 @@
 import { convertSpeedToFloat } from "../lib/utils";
 import Message, {
   SinglePointMessage,
-  ThreePointMessage
+  ThreePointMessage,
 } from "../types/Message";
 import { ViewMode } from "../types/ViewMode";
 
@@ -44,7 +44,9 @@ export default function TestShot({ onClick, selectedSpeed, mode }: Props) {
       onClick(generateThreePointTestData(selectedSpeed));
     } else if (mode === ViewMode.SINGLE_POINT) {
       onClick(generateSinglePointTestData(selectedSpeed));
-    } else if (mode === ViewMode.SHUTTER_TIMING) {
+    } else if (
+      [ViewMode.SHUTTER_TIMING, ViewMode.SHOT_BY_SHOT].includes(mode)
+    ) {
       onClick(generateThreePointTestData("1/250"));
     }
   };

@@ -20,6 +20,7 @@ import {
 } from "./types/Measurement";
 import Message, { MetadataMessage, Mode } from "./types/Message";
 import { ViewMode } from "./types/ViewMode";
+import ShotByShotView from "./components/ShotByShotView";
 
 const isDemo = (): boolean =>
   new URLSearchParams(window.location.search).get("demo") === "true";
@@ -76,11 +77,11 @@ function App() {
 
   useEffect(() => {
     const handleSelectSpeed = (message: InternalMessage) => {
-      if(message.type !== InternalMessageType.SelectSpeed){
-        return
+      if (message.type !== InternalMessageType.SelectSpeed) {
+        return;
       }
       setSelectedSpeed(message.data);
-    }
+    };
 
     messageHandler.on(InternalMessageType.SelectSpeed, handleSelectSpeed);
 
@@ -96,7 +97,7 @@ function App() {
           <ModeControl onChange={setMode} />
           <AddSpeed onAddSpeed={addSpeed} />
           <div className="control">
-          <button onClick={reset}>Reset data</button>
+            <button onClick={reset}>Reset data</button>
           </div>
           {isDemo() ? (
             <TestShot
@@ -120,6 +121,9 @@ function App() {
       </Conditional>
       <Conditional display={settings.mode === ViewMode.SHUTTER_TIMING}>
         <ShutterTimingView />
+      </Conditional>
+      <Conditional display={settings.mode === ViewMode.SHOT_BY_SHOT}>
+        <ShotByShotView />
       </Conditional>
     </>
   );

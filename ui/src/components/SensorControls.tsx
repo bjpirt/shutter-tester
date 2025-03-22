@@ -1,10 +1,12 @@
 import { useContext } from "react";
 import { Context, Settings } from "./SettingsContext";
+import Conditional from "./Conditional";
+import { ViewMode } from "../types/ViewMode";
 
 export default function SensorControls() {
   const { settings, setSettings } = useContext(Context);
 
-  const handleClick = (event: React.ChangeEvent<HTMLInputElement >) => {
+  const handleClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     const target = event.target.name;
     if (target in settings.sensorData) {
       const oldValue =
@@ -44,13 +46,15 @@ export default function SensorControls() {
         onChange={handleClick}
       ></input>
       <label htmlFor="seconds">1/X s</label>
-      <input
-        type="checkbox"
-        name="exposure"
-        checked={settings.sensorData.exposure}
-        onChange={handleClick}
-      ></input>
-      <label htmlFor="exposure">EV</label>
+      <Conditional display={settings.mode !== ViewMode.SHOT_BY_SHOT}>
+        <input
+          type="checkbox"
+          name="exposure"
+          checked={settings.sensorData.exposure}
+          onChange={handleClick}
+        ></input>
+        <label htmlFor="exposure">EV</label>
+      </Conditional>
     </div>
   );
 }

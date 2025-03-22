@@ -35,10 +35,9 @@ export const displaySpeed = (
   speedUs?: number,
   referenceUs?: number
 ): string => {
-  if (!speedUs || !referenceUs) {
+  if (!speedUs) {
     return "-";
   }
-  const evDiff = evDifference(speedUs, referenceUs);
 
   const output: string[] = [];
 
@@ -48,7 +47,8 @@ export const displaySpeed = (
   if (settings.seconds) {
     output.push(`${convertMicrosToFraction(speedUs)}s`);
   }
-  if (settings.exposure) {
+  if (settings.exposure && referenceUs) {
+    const evDiff = evDifference(speedUs, referenceUs);
     output.push(`${formatEv(evDiff)}`);
   }
 

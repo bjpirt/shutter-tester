@@ -1,6 +1,6 @@
 export enum ViewMode {
-  ONE_SHOT = "one_shot",
+  SHOT_BY_SHOT = "shot_by_shot",
   SHUTTER_TIMING = "shutter_timing",
   SINGLE_POINT = "single_point",
-  THREE_POINT = "three_point"
+  THREE_POINT = "three_point",
 }
