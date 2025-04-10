@@ -1,15 +1,15 @@
 import { ProcessedThreePointMeasurement } from "../types/Measurement"
 
-export const compensateMeasurement = (measurement: ProcessedThreePointMeasurement, width: number = 32, compensationWidth: number = 1): ProcessedThreePointMeasurement => {
+export const compensateMeasurement = (measurement: ProcessedThreePointMeasurement, sensorSeparation: number, compensationWidth: number = 1): ProcessedThreePointMeasurement => {
   // Using a simple linear extrapolation, work out the shutter width at the three measurement points
   // The assumption is that both shutters are travelling at similar speeds (if they're not, that needs
   // calibrating before using three point readings) so we will use an average
 
   // First, work out the speed at the two centre points between the three sensors
-  const shutter1Side1Speed = (width / 2) / measurement.shutter1.side1
-  const shutter1Side2Speed = (width / 2) / measurement.shutter1.side2
-  const shutter2Side1Speed = (width / 2) / measurement.shutter2.side1
-  const shutter2Side2Speed = (width / 2) / measurement.shutter2.side2
+  const shutter1Side1Speed = sensorSeparation / measurement.shutter1.side1
+  const shutter1Side2Speed = sensorSeparation / measurement.shutter1.side2
+  const shutter2Side1Speed = sensorSeparation / measurement.shutter2.side1
+  const shutter2Side2Speed = sensorSeparation / measurement.shutter2.side2
 
   // Next, extrapolate the speed at the three sensor points for both curtains
   const shutter1Sensor1Speed = shutter1Side1Speed + ((shutter1Side2Speed - shutter1Side1Speed) / 2)

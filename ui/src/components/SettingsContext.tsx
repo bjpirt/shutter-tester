@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import ShutterDirection from "../types/ShutterDirection";
 import { ViewMode } from "../types/ViewMode";
 
 export type SensorSettings = {
@@ -8,7 +9,7 @@ export type SensorSettings = {
 };
 
 export type Settings = {
-  compensation: boolean
+  compensation: boolean;
   mode: ViewMode;
   sensorData: SensorSettings & {
     display: boolean;
@@ -16,6 +17,7 @@ export type Settings = {
   shutterData: {
     display: boolean;
   };
+  shutterDirection: ShutterDirection;
 };
 
 const defaultSettings: Settings = {
@@ -30,6 +32,7 @@ const defaultSettings: Settings = {
   shutterData: {
     display: false,
   },
+  shutterDirection: ShutterDirection.Auto
 };
 
 export const Context = createContext({

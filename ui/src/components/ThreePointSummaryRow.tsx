@@ -1,5 +1,6 @@
 import { useContext } from "react";
 import averageThreePointMeasurements from "../lib/averageThreePointMeasurements";
+import getSensorSeparation from "../lib/getSensorSeparation";
 import {
   convertSpeedToFloat,
   displaySpeed,
@@ -25,7 +26,9 @@ export default function ThreePointSummaryRow({
   measurements,
 }: Props) {
   const { settings } = useContext(Context);
-  const averageMeasurements = averageThreePointMeasurements(measurements ?? [], settings.compensation)
+  const sensorSeparation = getSensorSeparation(settings.shutterDirection)
+
+  const averageMeasurements = averageThreePointMeasurements(measurements ?? [], settings.compensation, sensorSeparation)
 
   const speedUs = convertSpeedToFloat(speed) * 1000000;
 
