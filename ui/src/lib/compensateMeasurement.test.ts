@@ -18,7 +18,7 @@ describe("compensateMeasurement", () => {
       }
     }
 
-    const compensatedMeasurement = compensateMeasurement(uncompensatedMeasurement)
+    const compensatedMeasurement = compensateMeasurement(uncompensatedMeasurement, 16)
     expect(compensatedMeasurement).toStrictEqual({
       "sensor1": 375,
       "sensor2": 425,

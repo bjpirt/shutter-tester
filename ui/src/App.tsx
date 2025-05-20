@@ -3,8 +3,10 @@ import "./App.css";
 import AddSpeed from "./components/AddSpeed";
 import Conditional from "./components/Conditional";
 import Connect from "./components/Connect";
+import DirectionControl from "./components/DirectionControl";
 import ModeControl from "./components/ModeControl";
 import { Context } from "./components/SettingsContext";
+import ShotByShotView from "./components/ShotByShotView";
 import ShutterTimingView from "./components/ShutterTimingView";
 import SinglePointMeasurements from "./components/SinglePointMeasurements";
 import TestShot from "./components/TestShot";
@@ -19,14 +21,14 @@ import {
   ThreePointMeasurement,
 } from "./types/Measurement";
 import Message, { MetadataMessage, Mode } from "./types/Message";
+import ShutterDirection from "./types/ShutterDirection";
 import { ViewMode } from "./types/ViewMode";
-import ShotByShotView from "./components/ShotByShotView";
 
 const isDemo = (): boolean =>
   new URLSearchParams(window.location.search).get("demo") === "true";
 
 function App() {
-  const { settings } = useContext(Context);
+  const { settings, setSettings } = useContext(Context);
   const [speeds, setSpeeds] = useState(defaultSpeeds);
   const [selectedSpeed, setSelectedSpeed] = useState(speeds[0]);
 
@@ -44,6 +46,16 @@ function App() {
 
   const handleMetadataMessage = (message: MetadataMessage) => {};
 
+  const updateShutterDirection = (message: ThreePointMeasurement) => {
+    if(settings.shutterDirection === ShutterDirection.Auto){
+      if(message.sensor1.open < message.sensor3.open){
+        setSettings({...settings, shutterDirection: ShutterDirection.Vertical})
+      }else{
+        setSettings({...settings, shutterDirection: ShutterDirection.Horizontal})
+      }
+    }
+  }
+
   const handleMessage = ({ type, ...measurement }: Message) => {
     console.log({ type, ...measurement });
     if (type === "metadata") {
@@ -54,6 +66,7 @@ function App() {
         data: measurement as SinglePointMeasurement,
       });
     } else {
+      updateShutterDirection(measurement as ThreePointMeasurement)
       messageHandler.emit({
         type: InternalMessageType.ThreePointMeasurement,
         data: measurement as ThreePointMeasurement,
@@ -94,6 +107,7 @@ function App() {
     <>
       <header>
         <div className="connect">
+          <DirectionControl />
           <ModeControl onChange={setMode} />
           <AddSpeed onAddSpeed={addSpeed} />
           <div className="control">

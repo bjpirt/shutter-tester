@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import getSensorSeparation from "../lib/getSensorSeparation";
 import processThreePointMeasurement from "../lib/processThreePointMeasurement";
 import {
   convertSpeedToFloat,
@@ -23,8 +24,9 @@ export default function ThreePointDetailRow({
   const { settings } = useContext(Context);
 
   const speedUs = convertSpeedToFloat(selectedSpeed) * 1000000;
+  const sensorSeparation = getSensorSeparation(settings.shutterDirection)
 
-  const processedMeasurement = processThreePointMeasurement(measurement, settings.compensation);
+  const processedMeasurement = processThreePointMeasurement(measurement, settings.compensation, sensorSeparation);
 
   return (
     <tr className="measurement-detail">

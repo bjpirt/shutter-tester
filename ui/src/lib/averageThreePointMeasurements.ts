@@ -4,12 +4,12 @@ import processThreePointMeasurement from "./processThreePointMeasurement";
 const average = (input: number[]): number =>
   input.reduce((sum, currentValue) => sum + currentValue, 0) / input.length;
 
-const averageThreePointMeasurements = (measurements: ThreePointMeasurement[], compensate: boolean = false, width: number = 32): ProcessedThreePointMeasurement | undefined => {
+const averageThreePointMeasurements = (measurements: ThreePointMeasurement[], compensate: boolean = false, sensorSeparation: number = 20): ProcessedThreePointMeasurement | undefined => {
   if(measurements.length === 0){
     return undefined
   }
   
-  const processedMeasurements = measurements.map(m => processThreePointMeasurement(m, compensate, width))
+  const processedMeasurements = measurements.map(m => processThreePointMeasurement(m, compensate, sensorSeparation))
 
   return {
     sensor1: average(processedMeasurements.map(m => m.sensor1)),
