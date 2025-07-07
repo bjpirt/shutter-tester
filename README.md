@@ -1,7 +1,8 @@
 # Shutter Tester
 
 A low cost but capable three-point shutter speed tester that runs on ESP32. It uses the PCB design to provide the physical structure of the tester so that all you need to do is solder it together and all of the mechanical design is taken care of.
-It runs on ESP32 so is easily updated using the Arduino platform. The project is 100% open source (see the [license file](LICENSE.md) for details)
+It runs on ESP32 so is easily updated using the Arduino platform. The project is 100% open source (see the [license file](LICENSE.md) for details).
+The UI runs int he browser and communicates with the shutter tester via Bluetooth - you can try out the UI [here](https://bjpirt.github.io/shutter-tester/?demo=true).
 
 ## Design
 
@@ -41,15 +42,17 @@ There is a user interface that connects to the ESP32 from a Chrome web browser d
 
 ![The Bluetooth user interface](./docs/images/ui.jpg "The Bluetooth user interface")
 
-At the moment you need to run this locally. Steps:
+You can easily use the [latest version](https://bjpirt.github.io/shutter-tester/). You should then be able to click the `Connect` button and pair with your shutter tester using Bluetooth. Select the speed you want to test, set up the light and fire the shutter. The new reading should appear in the table.
+
+If you want to just try out the UI without a tester, you can use [this link](https://bjpirt.github.io/shutter-tester/?demo=true) and the "Test" button will simulate a shutter being fired. From a privacy perspective, the UI runs entirely in your browser and nothing goes over the internet.
+
+If you want to run this locally you can do the following:
 
 - Install Node.js (v22)
 - Open a terminal in the `ui` folder of this repository
 - run `npm install`
 - run `npm run dev`
 - Go to the URL printed in your terminal ([http://localhost:5173/](http://localhost:5173/))
-
-You should then be able to click the `Connect` button and pair with your shutter tester. Select the speed you want to test, set up the light and fire the shutter. The new reading should appear in the table.
 
 ### Using serial
 
@@ -79,12 +82,12 @@ Looking at the exposure time at each sensor, you can see the timings would need 
 
 # To Do
 
-- [ ] Automatically work out vertical or horizontal shutter
-- [ ] Enable detailed measurements to be shown / hidden in three point mode
-- [ ] Deploy to GitHub pages using GitHub actions
 - [ ] Calculate variations across shutter and whether they are within tolerances
 - [ ] Add graph visualisation of shutter speeds
 - [ ] Generate report from three point test
+- [x] Enable detailed measurements to be shown / hidden in three point mode
+- [x] Deploy to GitHub pages using GitHub actions
+- [x] Automatically work out vertical or horizontal shutter
 - [x] Display full shutter timing
 - [x] Separate shutter timing mode
 - [x] Single shot mode (only show last shot timing) - useful for initial tuning
@@ -96,3 +99,4 @@ Looking at the exposure time at each sensor, you can see the timings would need 
 - [ ] Enable different "runs" to be stored and compared so you can see progression when adjusting
 - [ ] Add exposure measurement with light to frequency sensor
 - [ ] Investigate reflective measurement from front of camera for e.g. Barnack Leicas
+- [ ] Investigate using an analog photodiode instead of a binary sensor
