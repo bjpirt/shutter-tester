@@ -1,21 +1,20 @@
 import { useContext, useEffect, useState } from "react";
+import getSensorSeparation from "../lib/getSensorSeparation";
 import messageHandler from "../lib/internalMessageBus";
 import processThreePointMeasurement from "../lib/processThreePointMeasurement";
 import { displayInterval, displaySpeed } from "../lib/utils";
 import { InternalMessage, InternalMessageType } from "../types/InternalMessage";
-import {
-  ProcessedThreePointMeasurement,
-  ThreePointMeasurement,
-} from "../types/Measurement";
-import Conditional from "./Conditional";
-import { Context } from "./SettingsContext";
-import SensorControls from "./SensorControls";
+import { ThreePointMeasurement } from "../types/Measurement";
 import CompensationControls from "./CompensationControls";
+import Conditional from "./Conditional";
+import SensorControls from "./SensorControls";
+import { Context } from "./SettingsContext";
 import ShutterControls from "./ShutterControls";
 
 export default function ShotByShotView() {
   const { settings } = useContext(Context);
   const [measurements, setMeasurements] = useState<ThreePointMeasurement[]>([]);
+  const sensorSeparation = getSensorSeparation(settings.shutterDirection)
 
   const removeMeasurement = (index: number) => {
     setMeasurements(measurements.filter((_, i) => i !== index));
@@ -83,7 +82,7 @@ export default function ShotByShotView() {
         </thead>
         <tbody>
           {measurements.map((m, index) => {
-            const processedMeasurement = processThreePointMeasurement(m);
+            const processedMeasurement = processThreePointMeasurement(m, true, sensorSeparation);
             return (
               <tr className="measurement-detail">
                 <Conditional display={settings.sensorData.display}>

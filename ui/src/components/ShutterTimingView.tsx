@@ -20,7 +20,7 @@ export default function ShutterTimingView() {
 
   const addMeasurement = (measurement: ThreePointMeasurement) => {
     setMeasurements([
-      processThreePointMeasurement(measurement),
+      processThreePointMeasurement(measurement, false, 0),
       ...measurements,
     ]);
   };

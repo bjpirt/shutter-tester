@@ -44,7 +44,7 @@ function App() {
     messageHandler.emit({ type: InternalMessageType.Reset });
   };
 
-  const handleMetadataMessage = (message: MetadataMessage) => {};
+  const handleMetadataMessage = (_: MetadataMessage) => {};
 
   const updateShutterDirection = (message: ThreePointMeasurement) => {
     if(settings.shutterDirection === ShutterDirection.Auto){
