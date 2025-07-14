@@ -32,6 +32,8 @@ The capacitors and resistors can be easily hand soldered (a finer soldering iron
 
 It's best to test the ESP32 module before soldering to ensure it's working fine. Program this using the sketch included and make sure it is outputting "Ready to measure" on the serial console (running at 921600 baud).
 
+It's a good idea to place some black insulation tape over the back of the sensors otherwise stray light can cause false readings.
+
 ## Usage
 
 Attach the shutter tester behind the shutter of the camera (I normally use 2 - 3 small blobs of Blu-Tak which works well). You can use the three larger holes in the tester to align with the edges of the shutter aperture. Open the shutter once you've this so you can check it's properly positioned by setting the shutter to "Bulb" and opening it. Remove the lens (if possible) and place a strong, even light at the front of the camera. You can use a full size bulb for this so long as it is the type that has a white diffuser bulb, not clear. Basically you want to ensure that light can pass directly through the three holes to reach the sensors, not at an angle. I've also had good results with a small USB powered LED panel.
