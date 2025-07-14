@@ -2,7 +2,7 @@
 
 A low cost but capable three-point shutter speed tester that runs on ESP32. It uses the PCB design to provide the physical structure of the tester so that all you need to do is solder it together and all of the mechanical design is taken care of.
 It runs on ESP32 so is easily updated using the Arduino platform. The project is 100% open source (see the [license file](LICENSE.md) for details).
-The UI runs int he browser and communicates with the shutter tester via Bluetooth - you can try out the UI [here](https://bjpirt.github.io/shutter-tester/?demo=true).
+The UI runs in the browser and communicates with the shutter tester via Bluetooth - you can try out the UI [here](https://bjpirt.github.io/shutter-tester/?demo=true).
 
 ## Design
 
@@ -12,7 +12,7 @@ The design of the shutter tester is quite simple; it uses three IS485E / IS486E 
 ![The shutter tester PCB front in 3D](./docs/images/front-3d.jpg "The shutter tester PCB front in 3D")
 ![The shutter tester PCB](./docs/images/pcb.jpg "The shutter tester PCB")
 
-Currently the sensor just prints out the shutter timings on the serial console, but there are plans to make this work with a more fully featured web-based tool using the built-in WiFi on the device.
+The sensor has a Bluetooth connection and you can connect this to Chrome to use quite a capable web interface so you can get a lot of detail on the calibration. You can try out the UI [here](https://bjpirt.github.io/shutter-tester/?demo=true)
 
 ## Bill of materials
 
